@@ -84,34 +84,34 @@ NOTE:
 -   Not all of these are "good" plots. We're just exploring `ggplot`.
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# The geom_bar() function adds a geometric layer that defaults to the count of each variable, which renders as solid vertical bar, that is, ascending the y axis
 ggplot(hikes, aes(x = rating)) +
   geom_bar()
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# The labs function adds custom labels to the x and y axes
 ggplot(hikes, aes(x = rating)) +
   geom_bar() +
   labs(x = "Rating", y = "Number of hikes")
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# The fill argument of the geom_bar function changes the fill, that is, internal, color of the geometry rendered
 ggplot(hikes, aes(x = rating)) +
   geom_bar(fill = "blue") +
   labs(x = "Rating", y = "Number of hikes")
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# The color argument of the geom_bar function changes the color of the outline of the geometry rendered
 ggplot(hikes, aes(x = rating)) +
   geom_bar(color = "orange", fill = "blue") +
   labs(x = "Rating", y = "Number of hikes")
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# The theme_minimal function changes the theme of the rendered plot to a more minimalistic style
 ggplot(hikes, aes(x = rating)) +
   geom_bar(color = "orange", fill = "blue")  +
   labs(x = "Rating", y = "Number of hikes") +
@@ -127,18 +127,24 @@ ggplot(hikes, aes(x = rating)) +
 Reflect on the `ggplot()` code.
 
 -   What's the purpose of the `+`? When do we use it?
+  To modify our plot with extra functions (which honestly work more like you'd expect arguments to, but regardless)
 -   We added the bars using `geom_bar()`? Why "geom"?
+  It refers to the bars being geometry, that is, geometric shapes
 -   What does `labs()` stand for?
+  Labels!
 -   What's the difference between `color` and `fill`?
+  Color refers to outline, fill is the inside!
 
 #### Part b {.unnumbered}
 
 In general, bar charts allow us to examine the following properties of a *categorical* variable:
 
 -   **observed categories**: What categories did we observe?
+Easy, moderate, and difficult 
 -   **variability between categories**: Are observations evenly spread out among the categories, or are some categories more common than others?
 
 We must then *translate* this information into the *context* of our analysis, here hikes in the Adirondacks. Summarize below what you learned from the bar chart, in context.
+According to the recorded data, the majority of Adirondacks hikes are moderately difficult. There are less easy hikes, and even less truly difficult ones
 
 #### Part c {.unnumbered}
 
@@ -157,7 +163,15 @@ Let's now consider some research questions related to the *quantitative* `elevat
 Here:
 
 -   Construct a **bar chart** of the *quantitative* `elevation` variable.
+```{r}
+#
+ggplot(hikes, aes(x = elevation)) +
+  geom_bar(color = "orange", fill = "blue")  +
+  labs(x = "Elevation", y = "Number of hikes") +
+  theme_minimal()
+```
 -   Explain why this might *not* be an effective visualization for this and other quantitative variables. (What questions does / doesn't it help answer?)
+Because it a lot of different individual points but is bad at show any trends because similar points are not properly grouped
 
 ```{r}
 ```
@@ -177,7 +191,9 @@ Quantitative variables require different viz than categorical variables. Especia
 Let's dig into some details.
 
 -   How many hikes have an elevation between 4500 and 4700 feet?
+6
 -   How many total hikes have an elevation of at least 5100 feet?
+2
 
 #### Part b {.unnumbered}
 
@@ -197,7 +213,7 @@ We must then *translate* this information into the *context* of our analysis, he
 2-MINUTE CHALLENGE: Thinking of the bar chart code, try to *intuit* what line you can tack on to the below frame of `elevation` to add a histogram layer. Don't forget a `+`. If it doesn't come to you within 2 minutes, *no problem* -- all will be revealed in the next exercise.
 
 ```{r}
-ggplot(hikes, aes(x = elevation))
+ggplot(hikes, aes(x = elevation)) 
 ```
 
 
@@ -206,46 +222,46 @@ ggplot(hikes, aes(x = elevation))
 Let's build some histograms. Try each chunk below, *one by one*. In each chunk, make a comment about how both the code and the corresponding plot both changed.
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# The geom_histogram created a histogram viz with 30 bins in default
 ggplot(hikes, aes(x = elevation)) +
   geom_histogram()
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# The color argument changes the outline color of the histogram bars
 ggplot(hikes, aes(x = elevation)) +
   geom_histogram(color = "white") 
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# The fill argument changes the color of the histogram bars themselves
 ggplot(hikes, aes(x = elevation)) +
   geom_histogram(color = "white", fill = "blue") 
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# THe labs function has added labels, as before
 ggplot(hikes, aes(x = elevation)) +
   geom_histogram(color = "white") +
   labs(x = "Elevation (feet)", y = "Number of hikes")
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# THe binwidth argument defines the width of histogram bars, or "bins", in this case to 1000 wide, which shows only very vague trends in this data
 ggplot(hikes, aes(x = elevation)) +
   geom_histogram(color = "white", binwidth = 1000) +
   labs(x = "Elevation (feet)", y = "Number of hikes")
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# here, binwidth is set to 5, which resembles a bar chart fairly closely
 ggplot(hikes, aes(x = elevation)) +
   geom_histogram(color = "white", binwidth = 5) +
   labs(x = "Elevation (feet)", y = "Number of hikes")
 ```
 
 ```{r}
-# COMMENT on the change in the code and the corresponding change in the plot
+# when binwidth is set to 200 in this data, trends are fairly reasonably shown, but outliers are sorted in 
 ggplot(hikes, aes(x = elevation)) +
   geom_histogram(color = "white", binwidth = 200) +
   labs(x = "Elevation (feet)", y = "Number of hikes")
@@ -255,11 +271,17 @@ ggplot(hikes, aes(x = elevation)) +
 ### Exercise 10: Histogram Follow-up {.unnumbered}
 
 -   What function added the histogram layer / geometry?
+geom_histogram
 -   What's the difference between `color` and `fill`?
+outline color and bin/bar fill color
 -   Why does adding `color = "white"` improve the visualization?
+it creates distinct boundaries between bins
 -   What did `binwidth` do?
+sets the x size of a bar/bin on the histogram
 -   Why does the histogram become ineffective if the `binwidth` is too big (e.g. 1000 feet)?
+trends are vague, the data is averaged
 -   Why does the histogram become ineffective if the `binwidth` is too small (e.g. 5 feet)?
+the data is a mess; you can't see trends 
 
 
 ### Exercise 11: Density Plots {.unnumbered}
@@ -278,13 +300,22 @@ ggplot(hikes, aes(x = elevation)) +
 -   INTUITION CHECK: Before tweaking the code and thinking back to `geom_bar()` and `geom_histogram()`, how do you *anticipate* the following code will change the plot?
 
     -   `geom_density(color = "blue")`
+    color of line/curve?
     -   `geom_density(fill = "orange")`
+    color of area under the curve?
+    
 
 -   TRY IT! Test out those lines in the chunk below. Was your intuition correct?
 
 ```{r}
+ggplot(hikes, aes(x = elevation)) +
+  geom_density(color = "blue")
 ```
-
+```{r}
+ggplot(hikes, aes(x = elevation)) +
+  geom_density(fill = "blue")
+#History will vindicate Merce Lutzker
+```
 -   Examine the density plot. How does it compare to the histogram? What does it tell you about the *typical* elevation, *variability / range* in elevations, and *shape* of the distribution of *elevations* within this range?
 
 
