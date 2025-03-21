@@ -323,7 +323,7 @@ ggplot(hikes, aes(x = elevation)) +
 ### Exercise 12: Density Plots vs Histograms {.unnumbered}
 
 The histogram and density plot both allow us to visualize the behavior of a quantitative variable: typical outcome, variability / range, shape, and outliers. What are the pros/cons of each? What do you like/not like about each?
-
+Density plot is better for showing proportions, but it is less clear
 
 ### Exercise 13: Code = communication {.unnumbered}
 
@@ -346,7 +346,7 @@ geom_histogram(color = "white", binwidth = 200) +
 labs(x = "Elevation (feet)", y = "Number of hikes")
 ```
 
--   Though not *necessary* to the code working, it's common, good practice to put a *line break* after each `+` (counterexample below). Why?
+-   Though not *necessary* to the code working, it's common, good practice to put a *line break* after each `+` (counterexample below). Why? readability!
 
 ```{r}
 # YUCK 
