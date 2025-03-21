@@ -117,15 +117,23 @@ Which verb would help us...
 
 a.  keep *only* information about state names, county names, and the 2020 and 2016 Democratic support (not the 2012 results, demographics, etc)
 
+Select, we would view the subset of those few columns
+
 b.  get *only* the data on Minnesota
+
+filter
 
 c.  define a new variable which calculates the *change* in Democratic support from 2016 to 2020, using `dem_pct_20` and `dem_pct_16`
 
+mutate (or summarize, although it would be seperate)
+
 d.  sort the counties from highest to lowest Democratic support
+
+arrange
 
 e.  determine the total number of votes cast across all counties
 
-
+summarize (or mutate, but it would be with everything else)
 
 ### Example 2: Select Columns
 
@@ -133,6 +141,7 @@ To get a sense for the code structure, let's explore a couple verbs together. To
 
 ```{r eval = FALSE}
 # What's the first argument? The second?
+#is the point here that its hard to tell? certainly theres sort of sub-arguments
 select(elections, c(state_name, county_name, dem_pct_20, dem_pct_16))
 ```
 
@@ -237,7 +246,10 @@ Would we get the same result if we reversed `select()` and `filter()`? Think fir
 
 ```{r}
 # Try it
-
+elections |>
+   filter(state_name == "Minnesota") |>
+   select(state_name, county_name, dem_pct_20, dem_pct_16)
+#its fine, because all columns are maintained with the filter function
 ```
 
 
@@ -259,6 +271,7 @@ mn <- elections |>
 head(mn)
 nrow(mn)
 nrow(elections)
+#seems to be right, there are 87 counties in minnesotqa, according to google at least!
 ```
 
 ## Exercises
@@ -275,9 +288,11 @@ Use `select()` to create a simplified dataset that we'll use throughout the exer
 
 ```{r}
 # Define elections_small
+elections_small <- elections |> 
+  select(state_name, county_name, total_votes_20, repub_pct_20, dem_pct_20, total_votes_16, dem_pct_16)
 #___ <- ___ |>
 #  ___(___)
-
+head(elections_small)
 # Check out the first 6 rows to confirm your code did what you think it did!
 
 ```
@@ -316,25 +331,39 @@ To comment/uncomment several lines of code at once, highlight them then click <k
 
 ```{r}
 # Keep only data on counties in Hawaii
-# elections_small |>
-#  filter(___ ___ ___)
+# Confused me, cuz i think hawaii has 5 counties
+elections_small |>
+ filter(state_name == "Hawaii")
+```
+```{r}
+# so i checked
+hi <- elections_small |>
+ filter(state_name == "Hawaii")
+nrow(hi)
+#and it only has 4 here, yeah!
+#apparently, its cuz kawalao county is partially governmentally subjugated to maui county cuz it only has 81 people
 ```
 
 ```{r}
 # What does this do?
-# elections_small |> 
-#   filter(state_name %in% c("Hawaii", "Delaware"))
+#it should filter for datapoints where state_name == either Hawaii or Delaware
+elections_small |> 
+  filter(state_name %in% c("Hawaii", "Delaware"))
 ```
 
 ```{r}
 # Keep only data on counties where the Republican got MORE THAN 93.97% of the vote in 2020
 # THINK: What variable is relevant here?
+elections_small |>
+     filter(repub_pct_20>93.97)
 
 ```
 
 ```{r}
 # Keep only data on counties where the Republican got AT LEAST 93.97% of the vote in 2020
 # This should have 1 more row (observation) than your answer above
+elections_small |>
+     filter(repub_pct_20>=93.97)
 
 ```
 
@@ -344,13 +373,13 @@ We can also filter with respect to 2 rules! Here, think what variables are relev
 # Keep only data on counties in Texas where the Democrat got more than 65% of the vote in 2020
 # Do this 2 ways.
 # Method 1: 2 filters with 1 condition each
-#elections_small |> 
-#  filter(___) |> 
-#  filter(___)
+elections_small |> 
+  filter(state_name== "Texas") |> 
+  filter(dem_pct_20>65)
 
 # Method 2: 1 filter with 2 conditions
-#elections_small |> 
-#  filter(___, ___)
+elections_small |> 
+  filter(state_name=="Texas", dem_pct_20>65)
 ```
 
 
@@ -365,14 +394,17 @@ We can also filter with respect to 2 rules! Here, think what variables are relev
 ```{r}
 # Arrange the counties in elections_small from lowest to highest percentage of 2020 Republican support
 # Print out just the first 6 rows
-# elections_small |> 
-#   arrange(___) |> 
-#   head()
+ elections_small |> 
+  arrange(repub_pct_20) |> 
+   head()
 ```
 
 ```{r}
 # Arrange the counties in elections_small from highest to lowest percentage of 2020 Republican support
 # Print out just the first 6 rows
+elections_small |> 
+  arrange(desc(repub_pct_20)) |>
+   head()
 ```
 
 
@@ -386,9 +418,9 @@ We can also filter with respect to 2 rules! Here, think what variables are relev
 
 ```{r}
 # What did this code do?
-# elections_small |> 
-#   mutate(diff_20 = repub_pct_20 - dem_pct_20) |> 
-#   head()
+ elections_small |> 
+   mutate(diff_20 = repub_pct_20 - dem_pct_20) |> 
+   head()
 ```
 
 ```{r}
