@@ -587,7 +587,11 @@ head(mn_wi)
 
 Construct and discuss a plot of the county-level change in Democratic vote percent in 2020 vs 2016, and how this differs between Minnesota and Wisconsin.
 
+In Minnesota, the most common change in vote percentage was somewhere around 2.6% percent more Democratic from 2016 to 2020 in a given county. However, it there is also somewhat of a positive skew which means there was a significant number of counties with 7.5 to 5 percent increases in democratic vote percentage. In Wisconsin, on the other hand, the mode rested somewhere much closer to a 1% increases, and there was a significant number of counties where democratic vote percentage decreased, usually by something like .75%. there remains a positive skew, but it doesn't plateau as much as minnesorta, and there are many wisconsin counties with more than a 3.5% increase in democratic vote percentage
 ```{r}
+ggplot(mn_wi, aes(x=dem_chng_16_20)) +
+  geom_histogram(color="white", fill="magenta2", binwidth=.4) +
+  facet_wrap(~ state_name)
 ```
 
 
@@ -748,23 +752,30 @@ Recall the World Cup football/soccer data from TidyTuesday:
 
 ```{r}
 world_cup <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-11-29/worldcups.csv")
+head(world_cup)
+str(world_cup)
 ```
 
 You can find a codebook [here](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-11-29). Use (some of) our 6 verbs (`select`, `filter`, `arrange`, `mutate`, `summarize`, `group_by`) and data viz to address the following prompts.
 
 ```{r}
 # In what years did Brazil win the World Cup?
-
+world_cup |>
+  filter(winner=="Brazil")
 ```
 
 ```{r}
 # What were the 6 World Cups with the highest attendance?
-
+world_cup |>
+  arrange(desc(attendance)) |>
+  head()
 ```
 
 ```{r}
 # Construct a univariate plot of goals_scored (no wrangling necessary)
 # This provides a visual summary of how the number of goals_scored varies from World Cup to World Cup
+ggplot(world_cup, aes(x=goals_scored)) +
+  geom_histogram(color="cadetblue2",fill="plum2")
 
 ```
 
@@ -772,20 +783,31 @@ You can find a codebook [here](https://github.com/rfordatascience/tidytuesday/tr
 # Let's follow up the plot with some more precise numerical summaries
 # Calculate the min, median, and max number of goals_scored across all World Cups
 # NOTE: Visually compare these numerical summaries to what you observed in the plot
+world_cup|>
+  summarize(
+    min(goals_scored), median(goals_scored), max(goals_scored))
+ggplot(world_cup, aes(y=goals_scored)) +
+  geom_boxplot()
 
 ```
 
 ```{r}
 # Construct a bivariate plot of how the number of goals_scored in the World Cup has changed over the years
 # No wrangling necessary
-
+ggplot(world_cup, aes(y=goals_scored,x=year)) +
+  geom_point(shape=4, color="firebrick1", size=2.5) +
+  geom_smooth()
 ```
 
 ```{r}
 # Our above summaries might be a bit misleading.
 # The number of games played at the World Cup varies.
 # Construct a bivariate plot of how the typical number of goals per game has changed over the years
-
+world_cup |>
+  mutate(goals_per = goals_scored/games)
+ggplot(world_cup, aes(y=goals_per, x=year))
+  geom_point(shape=4, color="firebrick1", size=2.5) +
+  geom_smooth()
 
 ```
 
