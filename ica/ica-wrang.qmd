@@ -796,7 +796,7 @@ ggplot(world_cup, aes(y=goals_scored)) +
 # No wrangling necessary
 ggplot(world_cup, aes(y=goals_scored,x=year)) +
   geom_point(shape=4, color="firebrick1", size=2.5) +
-  geom_smooth()
+  geom_smooth(alpha=0.1)
 ```
 
 ```{r}
@@ -804,10 +804,10 @@ ggplot(world_cup, aes(y=goals_scored,x=year)) +
 # The number of games played at the World Cup varies.
 # Construct a bivariate plot of how the typical number of goals per game has changed over the years
 world_cup |>
-  mutate(goals_per = goals_scored/games)
-ggplot(world_cup, aes(y=goals_per, x=year))
+  mutate(goals_per = goals_scored/games) |>
+ggplot( aes(y=goals_per, x=year)) +
   geom_point(shape=4, color="firebrick1", size=2.5) +
-  geom_smooth()
+  geom_smooth(alpha=0.1)
 
 ```
 
