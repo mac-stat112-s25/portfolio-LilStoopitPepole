@@ -6,7 +6,7 @@ Use this file for practice with the **univariate viz** in-class activity.  Refer
 
 ## Exercises
 
-{{< include activity-instructions.qmd >}}
+
 
 
 ```{r}
