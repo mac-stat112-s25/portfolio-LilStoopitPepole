@@ -39,6 +39,7 @@ book:
       - ica/ica-spatial.qmd
       - ica/ica-wrang.qmd
       - ica/ica-dates.qmd
+      - ica/ica-imp.qmd
 
 format:
   html:
