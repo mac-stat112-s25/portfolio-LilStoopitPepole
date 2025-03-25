@@ -439,12 +439,12 @@ imdb_messy |>
 #### Part b {.unnumbered}
 
 As a second step, let's think about *why* some values are missing. Study the individual observations with NAs carefully. Why do you think they are missing? Are certain films more likely to have more NAs than others?
-Associated values will be missing when something is absent, eg, when actor_3_name is NA, so is actor_3_facebook_likes. This might mean that in these cases, there literally aren't 3rd actors in these films. this includes 
+Associated values will be missing when something is absent, eg, when actor_3_name is NA, so is actor_3_facebook_likes. This might mean that in these cases, there literally aren't 3rd actors in these films. Its not immediately clear which films are more likely to have NAs, but one example near the top is Doug Walker's review of Star Wars the Force Awakens, which is officially a documentary, but is really a youtube video, and lacks lots of variables, both answerable (color, language) and less-so (gross, budget)
 
 #### Part c {.unnumbered}
 
 Consider a more specific example. Obtain a dataset of movies that are missing data on `actor_1_facebook_likes`. Then explain why you think there are NAs. HINT: `is.na(___)`
-
+All 7 of these documentaries have no actors listed, presumably consisting mostly of archival footage, and therefore have no actor facebooks to pull likes from. 
 ```{r}
 imdb_messy |>
   filter(is.na(actor_1_facebook_likes)==TRUE)
