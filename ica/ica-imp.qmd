@@ -326,17 +326,20 @@ Open `imdb_messy` in the spreadsheet-like viewer by typing `View(imdb_messy)` in
 Do a quick `summary()` of each variable in the dataset. *One* way to do this is below:
 
 ```{r}
-# imdb_messy |>
-#   mutate(across(where(is.character), as.factor)) |>  # convert characters to factors in order to summarize
-#   summary()
+ imdb_messy |>
+  mutate(across(where(is.character), as.factor)) |>  
+  # convert characters to factors in order to summarize
+  summary()
 ```
 
 Follow-up:
 
 -   What type of info is provided on quantitative variables?
+The minimum, maximum, median, and 1st and third quartiles
 -   What type of info is provided on categorical variables?
+How many times a given value shows up
 -   What stands out to you in these summaries? Is there anything you'd need to clean before using this data?
-
+There seems to be a lot of repeats on categorical variables, certainly on color (which is inconsistent) but also possibly on things like movie_title, although they may be movies with the same title rather than duplicate entries. In quantitative variables, there are a lot of NAs, and a good few in the categorical variables too, which is fine, we just would have to figure out what they mean and if we need to remove them are rename them depending on the column and what data we want to analyze
 
 
 ### Exercise 4: Clean Data: Factor Variables 1 {.unnumbered}
@@ -344,9 +347,12 @@ Follow-up:
 If you didn't already in Exercise 3, check out the `color` variable in the `imdb_messy` dataset.
 
 -   What's goofy about this / what do we need to fix?
+There are 3 names for Color movies, 2 for Black and White movies, and it is unclear what NA means
 -   More specifically, what different categories does the `color` variable take, and how many movies fall into each of these categories?
+There are roughly 4800 movies that are in color (with the value either being "Color","COLOR",or "color"), about 210 movies in black and white (with a value of either "B&W" or "Black and White"), and 19 movies for which color is Not Applicable, which is immediately apparent as to meaning
 
 ```{r}
+
 ```
 
 
@@ -359,6 +365,8 @@ When working with categorical variables like `color`, the categories must be "cl
 
 We *could* open the .csv file in, say, Excel or Google sheets, clean up the `color` variable, save a clean copy, and then reimport that into RStudio. BUT that would be the wrong thing to do. Why is it important to use R code, which we then save inside this qmd, to clean our data?
 
+It's much faster, and it is clearly reproducible from the starting point of the publically available data
+
 #### Part b {.unnumbered}
 
 Let's use R code to change the `color` variable so that it appropriately combines the various categories into only 2: `Color` and `Black_White`. We've learned a couple sets of string-related tools that could be handy here. First, starting with the `imdb_messy` data, change the `color` variable using one of the functions we learned in the **Factors** lesson.
@@ -368,6 +376,12 @@ Let's use R code to change the `color` variable so that it appropriately combine
 Store your results in `imdb_temp` (don't overwrite `imdb_messy`). To check your work, print out a `count()` table of the `color` variable in `imdb_temp`.
 
 ```{r}
+imdb_temp <- imdb_messy |>
+  mutate(color=
+    fct_recode(color, 
+               Color="COLOR", Color="color", Black_White="Black and White", Black_White="B&W"))
+  summary(imdb_temp)
+  count(imdb_temp, color)
 ```
 
 #### Part c {.unnumbered}
@@ -377,6 +391,22 @@ Repeat Part b using one of our string functions from the **String** lesson:
 `str_replace()`, `str_replace_all()`, `str_to_lower()`, `str_sub()`, `str_length()`, `str_detect()`
 
 ```{r}
+imdb_temp <- imdb_messy |>
+  mutate(color=
+    str_replace(color, 
+               "OLOR","olor")) |>
+  mutate(color=
+str_replace(color, 
+               "co","Co")) |>
+  mutate(color=
+str_replace(color, 
+               "&W","lack_White")) |>
+  mutate(color=
+str_replace(color, 
+               " and White","_White"))
+  summary(imdb_temp)
+  count(imdb_temp, color)
+  #although, it changes it from a factor to character string, which makes the summary less valuable. we can always change it back, but this is generally clunkier, unless im missing something
 ```
 
 
@@ -396,25 +426,28 @@ As a first step, let's simply understand the *volume* of NAs. Specifically:
 
 ```{r}
 # Count the total number of rows in imdb_messy
-#___(imdb_messy)
+nrow(imdb_messy)
 
 # Then count the number of NAs in each column
-#colSums(is.na(imdb_messy))
+colSums(is.na(imdb_messy))
 
 # Then count the number of NAs in a specific column
-#imdb_messy |> 
-#  ___(___(is.na(actor_1_facebook_likes)))
+imdb_messy |> 
+  summarize(sum(is.na(actor_1_facebook_likes)))
 ```
 
 #### Part b {.unnumbered}
 
 As a second step, let's think about *why* some values are missing. Study the individual observations with NAs carefully. Why do you think they are missing? Are certain films more likely to have more NAs than others?
+Associated values will be missing when something is absent, eg, when actor_3_name is NA, so is actor_3_facebook_likes. This might mean that in these cases, there literally aren't 3rd actors in these films. this includes 
 
 #### Part c {.unnumbered}
 
 Consider a more specific example. Obtain a dataset of movies that are missing data on `actor_1_facebook_likes`. Then explain why you think there are NAs. HINT: `is.na(___)`
 
 ```{r}
+imdb_messy |>
+  filter(is.na(actor_1_facebook_likes)==TRUE)
 ```
 
 
@@ -443,7 +476,8 @@ How are the NAs dealt with here? Did we have to create and save a new dataset in
 Try out the `drop_na()` function:
 
 ```{r}
-# imdb_temp <- drop_na(imdb_messy)
+ imdb_temp <- drop_na(imdb_messy)
+head(imdb_temp)
 ```
 
 Follow-up questions:

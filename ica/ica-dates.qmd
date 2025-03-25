@@ -574,6 +574,7 @@ weekly_births <- Birthdays |>
   summarize(wk_birth=sum(births))
 weekly_births |>
 arrange(desc(wk_birth))
+max(weekly_births$wk_birth)
 ggplot(weekly_births, aes(x=week,y=wk_birth,color=state)) +
   geom_line(linewidth=0.4)
 ```
