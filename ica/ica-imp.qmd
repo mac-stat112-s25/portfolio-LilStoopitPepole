@@ -232,6 +232,7 @@ https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata
 
 After visiting that website, take some quick notes here on the data *source* and *creator*.
 
+**Data was compiled by Kaggle, a data science learning site, from a movie database called TMBd, using their included API**
 
 ### Exercise 2: Import Data to RStudio {.unnumbered}
 
@@ -253,7 +254,7 @@ Putting this together, use `read_csv()` with the appropriate absolute file path 
 
 ```{r}
 library(tidyverse)
-# imdb_messy <- read_csv("___")
+imdb_messy <- read_csv("C:\\Users\\merce\\Documents\\MAC sophmore year\\data science\\portfolio\\portfolio-LilStoopitPepole\\data\\imdb_5000_messy.csv")
 ```
 
 #### Part b {.unnumbered}
@@ -265,7 +266,7 @@ Absolute file paths can get really long, depending upon our number of sub-folder
 getwd()
 ```
 
-Next, check what the working directory is for the *console* by typing `getwd()` in the *console*. This is probably different, meaning that the relative file paths that will work in your qmd won't work in the console! You can either exclusively work inside your qmd, or change the working directory in your console, by navigating to the following in the upper toolbar: Session \> Set Working Directory \> To Source File location.
+Next, check what the working directory is for the *console* by typing `getwd()` in the *console*. This is probably different, meaning that the relative file paths that will work in your qmd won't work in the console! You can either exclusively work inside your qmd (**THIS IS WHAT I NORMALLY DO ANYWAYS I DON'T USE THE CONSOLE FOR ANYTHING**), or change the working directory in your console, by navigating to the following in the upper toolbar: Session \> Set Working Directory \> To Source File location.
 
 #### Part c {.unnumbered}
 
@@ -281,7 +282,7 @@ Since our .qmd analysis and .csv data live in the same project, we don't have to
 Putting this together, use `read_csv()` with the appropriate relative file path to import your data into RStudio. Save this as `imdb_temp` (`temp` for "temporary"). Convince yourself that this worked, i.e. you get the same dataset as `imdb_messy`.
 
 ```{r}
-#imdb_temp <- read_csv("___")
+imdb_temp <- read_csv("..\\data\\imdb_5000_messy.csv")
 ```
 
 ::: {.callout-tip title="File Paths"}
@@ -302,7 +303,7 @@ The "data import cheat sheet" at the top of this qmd, or Google, are handy resou
 
 ```{r}
 # Try importing only the first 5 rows
-# read_csv("___", n_max = ___)
+ read_csv("..\\data\\imdb_5000_messy.csv", n_max = 5)
 ```
 
 ::: {.callout-tip title="Commenting/Uncommenting Code"}
