@@ -536,19 +536,27 @@ penguins |>
 #### Part a {.unnumbered}
 
 Calculate the total number of births in each month and year, eg, Jan 1969, Feb 1969, .... Label month by names not numbers, eg, Jan not 1. Then, plot the births by month and comment on what you learn.
-
-There 
+::: {.callout-tip title="Xtra notes on Dates and (Ordered) Factors"}
+You can use as.Date() to change character or numeric strings into dates!
+~~Still looking on how to combine ordinal factors, though (and change integers thereof?)~~
+It's fairly difficult to combine ordered factors but the forcats package should be of some help. The fct_c() and *fct_cross()* functions are for just that! https://forcats.tidyverse.org/reference/index.html 
+To actually make the integer year into a ordered factor is a whole other problem, but involves the native r functions factor() or ordered()
+:::
 ```{r}
 monthly_births <- Birthdays  |>
   mutate(mon_lab=month(date, label=TRUE)) |>
   group_by(year,mon_lab) |>
   summarize(mon_birth=sum(births))
+
 monthly_births
+
 ggplot(monthly_births,aes(x=mon_birth,y=mon_lab)) +
   geom_density_ridges()
 ggplot(monthly_births) +
-  geom_point(aes(y=mon_birth,x=mon_lab))
-#FLAG
+  geom_point(aes(y=mon_birth,x=mon_lab)) 
+#It seems that July, August, and September usually seem to have the most births, while November and February tend to have the least
+
+
 ```
 
 
@@ -556,14 +564,34 @@ ggplot(monthly_births) +
 
 In 1988, calculate the total number of births per week in each state. Get rid of week "53", which isn't a complete week! Then, make a line plot of births by week for each state and comment on what you learn. For example, do you notice any seasonal trends? Are these the same in every state? Any outliers?
 
+Its harder to see trends in the smaller states, but it seems that births peak from week 30 (around mid-late July) to week 40 (the end of September). This is most pronounce in California, with a steady peak centering around a maximum at week 38. Outliers are somewhat hard to see in this dataset, but Illinois seems to peak around week 12 (Mid-late March, that is, now!)
 ```{r}
+weekly_births <- Birthdays |>
+  filter(year==1988) |>
+  mutate(week=week(date)) |>
+  filter(week!=53) |>
+  group_by(state,week) |>
+  summarize(wk_birth=sum(births))
+weekly_births |>
+arrange(desc(wk_birth))
+ggplot(weekly_births, aes(x=week,y=wk_birth,color=state)) +
+  geom_line(linewidth=0.4)
 ```
 
 #### Part c {.unnumbered}
 
 Repeat the above for just Minnesota (MN) and Louisiana (LA). MN has one of the coldest climates and LA has one of the warmest. How do their seasonal trends compare? Do you think these trends are similar in other colder and warmer states? Try it!
+In Louisiana, the aforementioned July-September birth peak is much more pronounced, and there is also a fairly pronounced valley between March and early June. In MN, on the other hand, births stay much more steady, and mostly just drop surrounding the new year. A state like Wisconsin shows both this New Years drop off and summer peak, which here starts in mid May, while while somewhere like Arizona, while much less consistent, shows some shakey signs of this summertime peak
 
 ```{r}
+weekly_births |>
+  filter(state%in% c("MN","LA")) |>
+ggplot(aes(x=week,y=wk_birth,color=state)) +
+  geom_line(linewidth=0.4)
+weekly_births |>
+  filter(state%in% c("WI","AZ")) |>
+ggplot(aes(x=week,y=wk_birth,color=state)) +
+  geom_line(linewidth=0.4)
 ```
 
 
@@ -575,13 +603,23 @@ Repeat the above for just Minnesota (MN) and Louisiana (LA). MN has one of the c
 Create a dataset with only births in Massachusetts (MA) in 1979 and sort the days from those with the most births to those with the fewest.
 
 ```{r}
+Birthdays |>
+  filter(year==1979, state=="MA") |>
+  arrange(desc(births))
 ```
 
 #### Part b {.unnumbered}
 
 Make a table showing the five states with the most births between September 9, 1979 and September 12, 1979, including the 9th and 12th. Arrange the table in descending order of births.
-
-
+```{r}
+Birthdays |>
+  filter(date>=ymd("1979-09-09"),date<=ymd("1979-09-12")) |>
+  group_by(state) |>
+  summarize(prd_births=sum(births)) |>
+  arrange(desc(prd_births)) |>
+  head(n=5)
+  
+```
 ## Solutions
 
 <details>
