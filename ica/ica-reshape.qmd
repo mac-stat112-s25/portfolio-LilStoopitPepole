@@ -60,7 +60,7 @@ Define a new column that includes the *proportion* or *relative frequencies* of 
  penguins |>
   group_by(species,sex) |>
   summarize(number=n()) |>
-  group_by(species) |>
+ # group_by(species) |>
   mutate(part=number/sum(number))
   #TAG
 ```
