@@ -25,10 +25,9 @@ For more information about the topics covered in this chapter, refer to the reso
 -   [Reshaping data](https://mdsr-book.github.io/mdsr2e/ch-dataII.html#reshaping-data) by Baumer, Kaplan, and Horton
 :::
 
-
 ## Review
 
-### Example 1: warm-up counts and proportions {-}
+### Example 1: warm-up counts and proportions {.unnumbered}
 
 Recall the `penguins` we worked with last class:
 
@@ -40,11 +39,15 @@ penguins <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytues
 Tally up the number of male/female penguins by species in 2 ways:
 
 ```{r}
-# Using count()
 
+# Using count()
+penguins |>
+  count(species, sex)
 
 # Using group_by() and summarize()
-
+penguins |>
+  group_by(species,sex) |>
+  summarize(n())
 
 ```
 
@@ -54,12 +57,18 @@ Define a new column that includes the *proportion* or *relative frequencies* of 
 -   Does the order of `species` and `sex` in `group_by()` matter?
 
 ```{r}
+ penguins |>
+  group_by(species,sex) |>
+  summarize(number=n()) |>
+  group_by(species) |>
+  summarize(part=number/sum(number))
+  #TAG
 ```
 
+### Example 2: New data {.unnumbered}
 
-### Example 2: New data {-}
-
-What will the following code do? Think about it before running.
+What will the following code do?
+Think about it before running.
 
 ```{r}
 penguin_avg <- penguins |> 
@@ -68,24 +77,22 @@ penguin_avg <- penguins |>
   na.omit()
 ```
 
-
-### Example 3: units of observation {-}
+### Example 3: units of observation {.unnumbered}
 
 To get the information on average body masses, we *reshaped* our original data.
 
 1.  Did the *reshaping* process change the units of observation?
 
 ```{r}
-# Units of observation = ???
+# Units of observation = an individual penguin
 head(penguins)
 
-# Units of observation = ???
+# Units of observation = the entire group of male/female penguins of a certain species
 head(penguin_avg)
 ```
 
 2.  Did the reshaping process result in any information loss from the original data?
-
-
+Yes, we lost a bunch! We lost all sorts of data on islands, flipper and bill size, and the year of obvservation, along with the specifics of each penguin, and any data on penguins with NA for any of their values
 ## Reshaping Data
 
 There are two general types of reshaped data:
@@ -96,22 +103,23 @@ There are two general types of reshaped data:
 -   *raw* data, reshaped\
     We often want to retain all information on individual observations, but need to reshape it in order to perform the task at hand.
 
+### Example 4: reshape it with your mind {.unnumbered}
 
-### Example 4: reshape it with your mind {-}
+Let's calculate the *difference* in average body mass, male vs female, for each species.
+Since `penguin_avg` is small, we *could* do these calculations by hand.
+But this doesn't scale up to bigger datasets.
 
-Let's calculate the *difference* in average body mass, male vs female, for each species. Since `penguin_avg` is small, we *could* do these calculations by hand. But this doesn't scale up to bigger datasets.
-
--   Sketch out (on paper, in your head, anything) how this data would need to be *reshaped*, *without* losing any information, in order to calculate the differences in average body mass using our wrangling verbs. Make it as specific as possible, with column labels, entries, correct numbers, etc.
-
--   Identify the units of observation.
+-   Sketch out (on paper, in your head, anything) how this data would need to be *reshaped*, *without* losing any information, in order to calculate the differences in average body mass using our wrangling verbs.
+    Make it as specific as possible, with column labels, entries, correct numbers, etc.
+We could have individual columns for male and female body mass, which we could then mutate to find the difference
+-   Identify the units of observation. 
+Species on whole
 
 ```{r}
 penguin_avg
 ```
 
-
-
-### Wider vs Longer formats {-}
+### Wider vs Longer formats {.unnumbered}
 
 Making our data *longer* or *wider* reshapes the data, changing the units of observation while retaining *all* raw information:
 
@@ -123,8 +131,7 @@ Making our data *longer* or *wider* reshapes the data, changing the units of obs
 
 ![](https://mac-stat.github.io/images/112/pivot_wider.png)
 
-
-### Example 5: pivot wider {-}
+### Example 5: pivot wider {.unnumbered}
 
 Because it's a small enough dataset to examine all at once, let's start with our `penguin_avg` data:
 
@@ -132,7 +139,9 @@ Because it's a small enough dataset to examine all at once, let's start with our
 penguin_avg
 ```
 
-With the goal of being able to calculate the *difference* in average body mass, male vs female, for each species, let's make the dataset *wider*. That is, let's get one row per `species` with separate columns for the average body mass by `sex`. Put this code into a chunk and run it:
+With the goal of being able to calculate the *difference* in average body mass, male vs female, for each species, let's make the dataset *wider*.
+That is, let's get one row per `species` with separate columns for the average body mass by `sex`.
+Put this code into a chunk and run it:
 
 ```{r}
 
@@ -141,27 +150,30 @@ pivot_wider(names_from = sex, values_from = avg_body_mass)
 
 ```
 
-
-
 ```{r}
 ```
 
 ::: {.callout-note title="Pivot Wider"}
-
 -   `names_from` = the variable whose values we want to separate into their own columns, i.e. where we want to get the new column *names from*
 -   `values_from` = which variable to take the new column *values from*
-
 :::
 
 FOLLOW-UP:
 
 -   What are the units of observation?
+The species on whole
 -   Did we lose any information when we widened the data?
+Nope!
 -   Use the wide data to calculate the difference in average body mass, male vs female, for each species.
+```{r}
 
+penguin_avg |> 
+pivot_wider(names_from = sex, values_from = avg_body_mass) |>
+  mutate(body_mass_diff=(male-female))
 
+```
 
-### Example 6: Pivot longer {-}
+### Example 6: Pivot longer {.unnumbered}
 
 Let's store our wide data:
 
@@ -172,7 +184,9 @@ penguin_avg_wide <- penguin_avg |>
 penguin_avg_wide
 ```
 
-Suppose we wanted to change this data back to a *longer* format. In general, this happens when some variables (here `female` and `male`) represent two categories or values of some *broader* variable (here `sex`), and we want to combine them into that 1 variable without losing any information. Let's `pivot_longer()`:
+Suppose we wanted to change this data back to a *longer* format.
+In general, this happens when some variables (here `female` and `male`) represent two categories or values of some *broader* variable (here `sex`), and we want to combine them into that 1 variable without losing any information.
+Let's `pivot_longer()`:
 
 ```{r}
 # We can either communicate which variables we WANT to collect into a single column (female, male)
@@ -185,22 +199,21 @@ penguin_avg_wide |>
 ```
 
 ::: {.callout-note title="Pivot Longer"}
-
 -   `cols` = the columns (variables) to collect into a single, new variable. We can also specify what variables we *don't* want to collect
 -   `names_to` = the name of the new variable which will include the *names* or labels of the collected variables
 -   `values_to` = the name of the new variable which will include the *values* of the collected variables
-
 :::
 
 FOLLOW-UP:
 
 -   What are the units of observation?
+Male/female populations of each species
 -   Did we lose any information when we lengthened the data?
+Nope!
 -   Why did we put the variables in quotes "" here but not when we used `pivot_wider()`?
+Because the sex and avg_body mass columns no longer exist, so we are defining their names, rather than calling an object
 
-
-
-### Example 7: Practice {-}
+### Example 7: Practice {.unnumbered}
 
 Let's make up some data on the orders of 2 different customers at 3 different restaurants:
 
@@ -213,9 +226,12 @@ food <- data.frame(
 food
 ```
 
-The units of observation in `food` are customer / restaurant combinations. Wrangle this data so that the units of observation are customers, spreading the restaurants into separate columns.
+The units of observation in `food` are customer / restaurant combinations.
+Wrangle this data so that the units of observation are customers, spreading the restaurants into separate columns.
 
 ```{r}
+food |>
+  pivot_wider(names_from = restaurant,values_from = order)
 ```
 
 Consider 2 more customers:
@@ -233,19 +249,20 @@ more_food
 Wrangle this data so that the 3 restaurant columns are combined into 1, hence the units of observation are customer / restaurant combinations.
 
 ```{r}
+more_food |>
+  pivot_longer(cols = -customer, names_to = "Restaurant", values_to = "Order")
 ```
-
-
 
 ## Exercises
 
-{{< include activity-instructions.qmd >}}
 
 ### Exercise 1: What's the problem? {.unnumbered}
 
-Consider data on a sleep study in which subjects received only 3 hours of sleep per night.  Each day, their reaction time to a stimulus (in ms) was recorded.[^10-reshaping-data-1]
+Consider data on a sleep study in which subjects received only 3 hours of sleep per night.
+Each day, their reaction time to a stimulus (in ms) was recorded.[^ica-reshape-1]
 
-[^10-reshaping-data-1]: Gregory Belenky, Nancy J. Wesensten, David R. Thorne, Maria L. Thomas, Helen C. Sing, Daniel P. Redmond, Michael B. Russo and Thomas J. Balkin (2003) Patterns of performance degradation and restoration during sleep restriction and subsequent recovery: a sleep dose-response study. Journal of Sleep Research 12, 1–12.
+[^ica-reshape-1]: Gregory Belenky, Nancy J. Wesensten, David R. Thorne, Maria L. Thomas, Helen C. Sing, Daniel P. Redmond, Michael B. Russo and Thomas J. Balkin (2003) Patterns of performance degradation and restoration during sleep restriction and subsequent recovery: a sleep dose-response study.
+    Journal of Sleep Research 12, 1–12.
 
 ```{r}
 sleep_wide <- read.csv("https://mac-stat.github.io/data/sleep_wide.csv")
@@ -256,12 +273,21 @@ head(sleep_wide)
 #### Part a {.unnumbered}
 
 What are the units of observation in `sleep_wide`?
+Test Subjects
 
 #### Part b {.unnumbered}
 
-Suppose I ask you to plot each subject's reaction time (y-axis) vs the number of days of sleep restriction (x-axis). "Sketch" out in words what the first few rows of the data need to look like in order to do this. It might help to think about what you'd need to complete the plotting frame:
+Suppose I ask you to plot each subject's reaction time (y-axis) vs the number of days of sleep restriction (x-axis).
+"Sketch" out in words what the first few rows of the data need to look like in order to do this.
+It might help to think about what you'd need to complete the plotting frame:
 
-`ggplot(___, aes(y = ___, x = ___, color = ___))`
+You would want to have each day as its own row, with each subject having one for each of th 9 days. the reaction times would end up in another column. it might look something like
+
+subject   day   react_ms
+308       0     249.56
+308       1     258.70
+
+`ggplot(sleep_long, aes(y = react_ms, x = day, color = Subject))`
 
 #### Part c {.unnumbered}
 
@@ -271,10 +297,12 @@ How can you obtain the dataset you sketched in part b?
 -   `pivot_longer()`
 -   `pivot_wider()`
 
+pivot_longer() would probably be best!
 
 ### Exercise 2: Pivot longer {.unnumbered}
 
-To plot reaction time by day for each subject, we need to reshape the data into a **long** format where each row represents a subject/day combination. Specifically, we want a dataset with 3 columns and a first few rows that look something like this:
+To plot reaction time by day for each subject, we need to reshape the data into a **long** format where each row represents a subject/day combination.
+Specifically, we want a dataset with 3 columns and a first few rows that look something like this:
 
 | Subject | day | reaction_time |
 |--------:|----:|--------------:|
@@ -284,12 +312,18 @@ To plot reaction time by day for each subject, we need to reshape the data into 
 
 #### Part a {.unnumbered}
 
-Use `pivot_longer()` to create the long-format dataset above. Show the first 3 lines (`head(3)`), which should be *similar* to those above. Follow-up: Thinking forward to plotting reaction time vs day for each subject, what would you like to fix / change about this dataset?
+Use `pivot_longer()` to create the long-format dataset above.
+Show the first 3 lines (`head(3)`), which should be *similar* to those above.
+Follow-up: Thinking forward to plotting reaction time vs day for each subject, what would you like to fix / change about this dataset?
 
 ```{r}
 # For cols, try 2 appproaches: using - and starts_with
-# ___ |> 
-#   pivot_longer(cols = ___, names_to = "___", values_to = "___")
+sleep_wide |>
+  pivot_longer(cols = -Subject, names_to = "day", values_to = "react_ms") |>
+  head(3)
+sleep_wide |>
+  pivot_longer(cols =starts_with("day"), names_to = "day", values_to = "react_ms") |>
+  head(3)
 ```
 
 #### Part b {.unnumbered}
@@ -309,19 +343,30 @@ head(sleep_long)
 Follow-up:
 
 -   Besides putting each argument on a different line for readability and storing the results, what changed in the code?
+It removed the "day" from the start of the values in the day coloumn (which was originally part of their object label)
 -   How did this impact how the values are recorded in the `day` column?
-
+It made them into integers, although they are still class chr
 #### Part c {.unnumbered}
 
-Using `sleep_long`, construct a line plot of reaction time vs day for each subject. This will look goofy no matter what you do. Why? HINT: look back at `head(sleep_long)`. What class or type of variables are `Subject` and `day`? What do we *want* them to be?
+Using `sleep_long`, construct a line plot of reaction time vs day for each subject.
+This will look goofy no matter what you do.
+Why?
+HINT: look back at `head(sleep_long)`.
+What class or type of variables are `Subject` and `day`?
+Subject is an integer (Why? Like in the first place...) and day is a character string
+What do we *want* them to be?
+The reverse!
 
 ```{r}
+ggplot(sleep_long, aes(x=day,y=reaction_time,color=Subject)) +
+  geom_point()
 ```
-
 
 ### Exercise 3: Changing variable classes & plotting {.unnumbered}
 
-Let's finalize `sleep_long` by *mutating* the `Subject` variable to be a `factor` (categorical) and the `day` variable to be `numeric` (quantitative). Take note of the `mutate()` code! You'll use this type of code a lot.
+Let's finalize `sleep_long` by *mutating* the `Subject` variable to be a `factor` (categorical) and the `day` variable to be `numeric` (quantitative).
+Take note of the `mutate()` code!
+You'll use this type of code a lot.
 
 ```{r}
 sleep_long <- sleep_wide |>
@@ -343,23 +388,27 @@ head(sleep_long)
 ```{r}
 # Make a line plot of reaction time by day for each subject
 # Put these all on the same frame
-
+ggplot(sleep_long, aes(x=day,y=reaction_time,color=Subject)) +
+  geom_line()
 ```
 
 ```{r}
 # Make a line plot of reaction time by day for each subject
 # Put these all on separate frames (one per subject)
-
+ggplot(sleep_long, aes(x=day,y=reaction_time)) +
+  geom_line() +
+  facet_wrap(~ Subject)
 ```
 
 #### Part b {.unnumbered}
 
-Summarize what you learned from the plots. For example:
+Summarize what you learned from the plots.
+For example:
 
 -   What's the general relationship between reaction time and sleep?
+Reaction time increases (that is, gets longer) as days of sleeping 3 hours increase
 -   Is this the same for everybody? What differs?
-
-
+Nope! Some had major outliers of both faster and slower reaction time, of course, but the general trends also differed between subjects. Some had a delayed response, and some people weren't significantly affected. for Subject 335, their reaction time actually got **better**
 
 ### Exercise 4: Pivot wider {.unnumbered}
 
@@ -367,12 +416,13 @@ Make the data *wide* again, with each day becoming its own column.
 
 #### Part a {.unnumbered}
 
-Adjust the code below. What don't you like about the column labels?
+Adjust the code below.
+What don't you like about the column labels?
 
 ```{r}
-# sleep_long |>
-#   pivot_wider(names_from = ___, values_from = ___) |> 
-#   head()
+sleep_long |>
+  pivot_wider(names_from = day, values_from = reaction_time) |>
+  head()
 ```
 
 #### Part b {.unnumbered}
@@ -380,16 +430,15 @@ Adjust the code below. What don't you like about the column labels?
 Using your intuition, adjust your code from part a to name the reaction time columns "day_0", "day_1", etc.
 
 ```{r}
-# sleep_long |>
-#   pivot_wider(names_from = ___, values_from = ___, names_prefix = "___") |> 
-#   head()
+sleep_long |>
+  pivot_wider(names_from = day, values_from = reaction_time, names_prefix = "day_") |>
+  head()
 ```
-
-
 
 ### Exercise 5: Practice with Billboard charts {.unnumbered}
 
-Load data on songs that hit the `billboard` charts around the year 2000. Included for each song is the `artist` name, `track` name, the date it hit the charts (`date.enter`), and `wk`-related variables that indicate rankings in each subsequent week on the charts:
+Load data on songs that hit the `billboard` charts around the year 2000.
+Included for each song is the `artist` name, `track` name, the date it hit the charts (`date.enter`), and `wk`-related variables that indicate rankings in each subsequent week on the charts:
 
 ```{r}
 # Load data
@@ -404,9 +453,14 @@ In using this data, you'll need to determine if and when the data needs to be re
 
 #### Part a {.unnumbered}
 
-Construct and summarize a plot of how a song's Billboard ranking its 2nd week on the chart (y-axis) is related to its ranking the 1st week on the charts (x-axis). Add a reference line `geom_abline(intercept = 0, slope = 1)`. Songs *above* this line *improved* their rankings from the 1st to 2nd week.
+Construct and summarize a plot of how a song's Billboard ranking its 2nd week on the chart (y-axis) is related to its ranking the 1st week on the charts (x-axis).
+Add a reference line `geom_abline(intercept = 0, slope = 1)`.
+Songs *above* this line *improved* their rankings from the 1st to 2nd week.
 
 ```{r}
+ggplot(billboard,aes(x=wk1,y=wk2)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1)
 ```
 
 #### Part b {.unnumbered}
@@ -414,6 +468,8 @@ Construct and summarize a plot of how a song's Billboard ranking its 2nd week on
 Use your wrangling tools to identify *which* songs are those above the line in Part a, i.e. with rankgings that went up from week 1 to week 2.
 
 ```{r}
+billboard|>
+  filter(wk1<wk2)
 ```
 
 #### Part c {.unnumbered}
@@ -425,18 +481,27 @@ Define a new dataset, `nov_1999`, which:
 
 ```{r}
 # Define nov_1999
-
+nov_1999 <- billboard|>
+  filter(date.entered=="1999-11-06") |>
+  select(!c(track,date.entered))
 
 # Confirm that nov_1999 has 2 rows (songs) and 77 columns
-
+nov_1999
 
 ```
 
 #### Part d {.unnumbered}
 
-Create and discuss a visualization of the rankings (y-axis) over time (x-axis) for the 2 songs in `nov_1999`. There are hints below (if you scroll), but you're encouraged to play around and use as few hints as possible.
+Create and discuss a visualization of the rankings (y-axis) over time (x-axis) for the 2 songs in `nov_1999`.
+There are hints below (if you scroll), but you're encouraged to play around and use as few hints as possible.
 
 ```{r}
+nov_1999 |>
+  pivot_longer(cols=-artist,names_to = "weeks",values_to = "rank",names_prefix = "wk") |>
+  mutate(weeks=as.numeric(weeks)) |>
+  na.omit()|>
+    ggplot(aes(x=weeks,y=rank,color=artist)) +
+      geom_line()
 ```
 
 Hints:
@@ -444,25 +509,33 @@ Hints:
 -   Should you first pivot wider or longer?
 -   Once you pivot, the week number is turned into a character variable. How can you change it to a number?
 
-
-
 ### Exercise 6: Practice with the Daily Show {.unnumbered}
 
-The data associated with [this article](https://fivethirtyeight.com/datalab/every-guest-jon-stewart-ever-had-on-the-daily-show/) is available in the `fivethirtyeight` package, and is loaded into `daily` below. It includes a list of every guest to ever appear on Jon Stewart's The Daily Show, a "late-night talk and satirical news" program (per Wikipedia). Check out the dataset and note that when multiple people appeared together, each person receives their own line:
+The data associated with [this article](https://fivethirtyeight.com/datalab/every-guest-jon-stewart-ever-had-on-the-daily-show/) is available in the `fivethirtyeight` package, and is loaded into `daily` below.
+It includes a list of every guest to ever appear on Jon Stewart's The Daily Show, a "late-night talk and satirical news" program (per Wikipedia).
+Check out the dataset and note that when multiple people appeared together, each person receives their own line:
 
 ```{r}
 library(fivethirtyeight)
 data("daily_show_guests")
 daily <- daily_show_guests
+daily
 ```
 
 In analyzing this data, you'll need to determine if and when the data needs to be reshaped.
 
 #### Part a {.unnumbered}
 
-Identify the 15 guests that appeared the most. (This isn't a very diverse guest list!)
+Identify the 15 guests that appeared the most.
+(This isn't a very diverse guest list!)
 
 ```{r}
+daily |>
+  group_by(raw_guest_list) |>
+  summarize(appearances=n()) |>
+  arrange(desc(appearances)) |>
+  head(15)
+  
 ```
 
 #### Part b {.unnumbered}
@@ -476,9 +549,19 @@ CHALLENGE: Create the following data set containing 19 columns:
 There are hints below (if you scroll), but you're encouraged to play around and use as few hints as possible.
 
 ```{r}
+daily |>
+  group_by(raw_guest_list,year) |>
+  summarize(num=n()) |>
+  arrange(year) |>
+  pivot_wider(names_from = year,values_from = num,names_prefix = "app_",values_fill = 0) |>
+  mutate("total"=app_1999+app_2000+app_2001+app_2002+app_2003+app_2004+app_2005+app_2006+app_2007+app_2008+app_2009+app_2010+app_2011+app_2012+app_2013+app_2014+app_2015) |>
+  arrange(desc(total)) |>
+  head(15)
+  #FLAG
 ```
 
-HINTS: There are lots of ways to do this. You don't necessarily need all of these hints.
+HINTS: There are lots of ways to do this.
+You don't necessarily need all of these hints.
 
 -   First obtain the number of times a guest appears each year.
 -   Add a new column which includes the total number of times a guest appears across all years.
@@ -487,14 +570,19 @@ HINTS: There are lots of ways to do this. You don't necessarily need all of thes
 
 #### Part c {.unnumbered}
 
-Let's recreate the first figure from [the article](https://fivethirtyeight.com/datalab/every-guest-jon-stewart-ever-had-on-the-daily-show/). This groups all guests into 3 broader occupational categories. However, our current data has 18 categories:
+Let's recreate the first figure from [the article](https://fivethirtyeight.com/datalab/every-guest-jon-stewart-ever-had-on-the-daily-show/).
+This groups all guests into 3 broader occupational categories.
+However, our current data has 18 categories:
 
 ```{r}
 daily |> 
   count(group)
 ```
 
-Let's define a new dataset that includes a new variable, `broad_group`, that buckets these 18 categories into the 3 bigger ones used in the article. And get rid of any rows missing information on `broad_group`. You'll learn the code soon! For now, just run this chunk:
+Let's define a new dataset that includes a new variable, `broad_group`, that buckets these 18 categories into the 3 bigger ones used in the article.
+And get rid of any rows missing information on `broad_group`.
+You'll learn the code soon!
+For now, just run this chunk:
 
 ```{r}
 plot_data <- daily |> 
@@ -507,12 +595,17 @@ plot_data <- daily |>
   filter(!is.na(broad_group))
 ```
 
-Now, using the `broad_group` variable in `plot_data`, recreate the graphic from the article, with three different lines showing the fraction of guests in each group over time. Note: You'll have to wrangle the data first.
+Now, using the `broad_group` variable in `plot_data`, recreate the graphic from the article, with three different lines showing the fraction of guests in each group over time.
+Note: You'll have to wrangle the data first.
 
 ```{r}
+plot_data |>
+  group_by(year,broad_group) |>
+  summarize(appearances=n()) |>
+  ggplot(aes(x=year,y=appearances,color=broad_group)) +
+  geom_line()
+#FLAG
 ```
-
-
 
 ## Solutions
 
@@ -545,8 +638,6 @@ penguins |>
   mutate(proportion = n / sum(n))
 ```
 
-
-
 ### Example 3: units of observation {.unnumbered}
 
 ```{r}
@@ -557,8 +648,6 @@ head(penguins)
 head(penguin_avg)
 ```
 
-
-
 ### Example 5: pivot wider {.unnumbered}
 
 ```{r}
@@ -568,9 +657,11 @@ penguin_avg |>
 
 FOLLOW-UP:
 
--   What are the units of observation? species
+-   What are the units of observation?
+    species
 
--   Did we lose any information when we widened the data? no
+-   Did we lose any information when we widened the data?
+    no
 
 -   Use the wide data to calculate the difference in average body mass, male vs female, for each species.
 
@@ -579,8 +670,6 @@ penguin_avg |>
   pivot_wider(names_from = sex, values_from = avg_body_mass) |> 
   mutate(diff = male - female)
 ```
-
-
 
 ### Example 6: Pivot longer {.unnumbered}
 
@@ -596,13 +685,13 @@ penguin_avg_wide |>
 
 FOLLOW-UP:
 
--   What are the units of observation? species/sex combos
+-   What are the units of observation?
+    species/sex combos
 
--   Did we lose any information when we lengthened the data? no
+-   Did we lose any information when we lengthened the data?
+    no
 
-
-
-### Example 7: Practice [-]
+### Example 7: Practice \[-\]
 
 ```{r}
 food <- data.frame(
@@ -632,8 +721,6 @@ more_food |>
 
 ```
 
-
-
 ### Exercise 1: What's the problem? {.unnumbered}
 
 #### Part a {.unnumbered}
@@ -643,8 +730,6 @@ subjects/people
 #### Part c {.unnumbered}
 
 `pivot_longer()`
-
-
 
 ### Exercise 2: Pivot longer {.unnumbered}
 
@@ -661,7 +746,8 @@ sleep_wide |>
 
 #### Part b {.unnumbered}
 
-Adding `names_prefix = "day_"` removed "day\_" from the start of the `day` entries. did this impact how the values are recorded in the `day` column?
+Adding `names_prefix = "day_"` removed "day\_" from the start of the `day` entries.
+did this impact how the values are recorded in the `day` column?
 
 ```{r}
 sleep_long <- sleep_wide |>
@@ -673,14 +759,13 @@ sleep_long <- sleep_wide |>
 
 #### Part c {.unnumbered}
 
-`Subject` is an integer and `day` is a character. We want them to be categorical (factor) and numeric, respectively.
+`Subject` is an integer and `day` is a character.
+We want them to be categorical (factor) and numeric, respectively.
 
 ```{r}
 ggplot(sleep_long, aes(y = reaction_time, x = day, color = Subject)) + 
   geom_line()
 ```
-
-
 
 ### Exercise 3: Changing variable classes & plotting {.unnumbered}
 
@@ -714,9 +799,8 @@ ggplot(sleep_long, aes(y = reaction_time, x = day, color = Subject)) +
 
 #### Part b {.unnumbered}
 
-Reaction time increases (worsens) with a lack of sleep. Some subjects seem to be more impacted than others by lack of sleep, and some tend to have faster/slower reaction times in general.
-
-
+Reaction time increases (worsens) with a lack of sleep.
+Some subjects seem to be more impacted than others by lack of sleep, and some tend to have faster/slower reaction times in general.
 
 ### Exercise 4: Pivot wider {.unnumbered}
 
@@ -736,12 +820,12 @@ sleep_long |>
   head()
 ```
 
-
 ### Exercise 5: Practice with Billboard charts {.unnumbered}
 
 #### Part a {.unnumbered}
 
-The higher a song's week 1 rating, the higher its week 2 rating tends to be. But almost all song's rankings drop from week 1 to week 2.
+The higher a song's week 1 rating, the higher its week 2 rating tends to be.
+But almost all song's rankings drop from week 1 to week 2.
 
 ```{r}
 ggplot(billboard, aes(y = wk2, x = wk1)) + 
@@ -785,8 +869,6 @@ nov_1999 |>
     geom_line()
 ```
 
-
-
 ### Exercise 6: Practice with the Daily Show {.unnumbered}
 
 #### Part a {.unnumbered}
@@ -826,4 +908,4 @@ plot_data |>
 
 </details>
 
----
+------------------------------------------------------------------------
