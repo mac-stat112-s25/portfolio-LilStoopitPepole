@@ -61,7 +61,7 @@ Define a new column that includes the *proportion* or *relative frequencies* of 
   group_by(species,sex) |>
   summarize(number=n()) |>
   group_by(species) |>
-  summarize(part=number/sum(number))
+  mutate(part=number/sum(number))
   #TAG
 ```
 
@@ -552,9 +552,10 @@ There are hints below (if you scroll), but you're encouraged to play around and 
 daily |>
   group_by(raw_guest_list,year) |>
   summarize(num=n()) |>
+  mutate("total"=sum(num)) |>
   arrange(year) |>
   pivot_wider(names_from = year,values_from = num,names_prefix = "app_",values_fill = 0) |>
-  mutate("total"=app_1999+app_2000+app_2001+app_2002+app_2003+app_2004+app_2005+app_2006+app_2007+app_2008+app_2009+app_2010+app_2011+app_2012+app_2013+app_2014+app_2015) |>
+#  mutate("total"=app_1999+app_2000+app_2001+app_2002+app_2003+app_2004+app_2005+app_2006+app_2007+app_2008+app_2009+app_2010+app_2011+app_2012+app_2013+app_2014+app_2015) |>
   arrange(desc(total)) |>
   head(15)
   #FLAG
@@ -602,7 +603,8 @@ Note: You'll have to wrangle the data first.
 plot_data |>
   group_by(year,broad_group) |>
   summarize(appearances=n()) |>
-  ggplot(aes(x=year,y=appearances,color=broad_group)) +
+  mutate(percent_app=appearances/sum(appearances)) |>
+  ggplot(aes(x=year,y=percent_app,color=broad_group)) +
   geom_line()
 #FLAG
 ```
