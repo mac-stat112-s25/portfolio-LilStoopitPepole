@@ -543,6 +543,7 @@ It's fairly difficult to combine ordered factors but the forcats package should 
 To actually make the integer year into a ordered factor is a whole other problem, but involves the native r functions factor() or ordered()
 :::
 ```{r}
+library(ggridges)
 monthly_births <- Birthdays  |>
   mutate(mon_lab=month(date, label=TRUE)) |>
   group_by(year,mon_lab) |>

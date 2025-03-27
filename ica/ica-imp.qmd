@@ -94,7 +94,7 @@ But there are many other common file types. For example, the following are compa
 
 ### STEP 1: Find Data {.unnumbered}
 
-Check the [Datasets](99-data-repo.qmd) page for information about how to find a dataset that fits your needs.
+Check the Datasets page for information about how to find a dataset that fits your needs.
 
 
 

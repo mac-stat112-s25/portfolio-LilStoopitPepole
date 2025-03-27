@@ -645,7 +645,7 @@ What's the grade-point average for each instructor? Order from low to high.
 grades |>
   left_join(gpa_conversion) |>
   left_join(courses) |>
-  arrange(sessionID)
+  arrange(sessionID) |>
   group_by(iid) |>
   summarize(gpa= mean(gp, na.rm=TRUE)) |>
   arrange(gpa)
