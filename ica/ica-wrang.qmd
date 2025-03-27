@@ -536,7 +536,8 @@ It ought to throw up an error, since the select refers to a variable that doesn'
 
 :::
 
-```{r}
+```{r eval=FALSE}
+#|eval: false
 # Now try it. Change the order of mutate and select below.
 elections_small |> 
    filter(state_name == "Delaware") |> 
