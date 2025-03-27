@@ -93,10 +93,13 @@ Our goal is to *combine* or *join* these datasets into one. For reference, here 
 First, consider the following:
 
 -   What variable or **key** do these datasets have in common? Thus by what information can we *match* the observations in these datasets?
+class
 
 -   Relative to this key, what info does `students_1` have that `enrollments_1` doesn't?
+The student in the class. Also, data on ANTH101
 
 -   Relative to this key, what info does `enrollments_1` have that `students_1` doesn't?
+the number of enrollments in the class. Also, data on ART101
 
 
 ## Mutating Joins: `left`, `inner`, `full`
@@ -116,10 +119,14 @@ students_1 |>
 ```
 
 -   What did this do? What are the roles of `students_1` (the *left* table) and `enrollments_1` (the *right* table)?
+students_1 sets the unit of observation, student, and enrollments_1 adds the value of enrollments
 
 -   What, if anything, would change if we reversed the order of the data tables? Think about it, then try.
+Class would be the furthest left, and student would be NA for ART101
 
 ```{r}
+enrollments_1 |>
+  left_join(students_1)
 ```
 
 ### Example 3 {-}
@@ -134,10 +141,15 @@ students_1 |>
 ```
 
 -   What did this do? What are the roles of `students_1` (the *left* table) and `enrollments_1` (the *right* table)?
+It only joined data for which both dataframes shared a key value, and therefore preserves both units of observation
 
 -   What, if anything, would change if we reversed the order of the data tables? Think about it, then try.
+Probably, the position of class and student would just be switched
+Oh jeez, student got sent all the way over to the right!
 
 ```{r}
+enrollments_1 |> 
+  inner_join(students_1)
 ```
 
 ### Example 4 {-}
@@ -152,10 +164,16 @@ students_1 |>
 ```
 
 -   What did this do? What are the roles of `students_1` (the *left* table) and `enrollments_1` (the *right* table)?
+class, the key variable, became the unit of observation, and all rows that had any defined values were included
 
 -   What, if anything, would change if we reversed the order of the data tables? Think about it, then try.
+again, student would be shunted all the way to the right, i reckon
+
+The order also changed! that makes sense. It conformed to the first table, and added the secondary to the end
 
 ```{r}
+enrollments_1 |> 
+  full_join(students_1)
 ```
 
 ### Summary 
@@ -195,12 +213,17 @@ students_1 |>
 ```
 
 -   What did this do? What info would it give us?
+It tells us if the observations on the left are represented in the dataframe on the right (ie, they are in the THD building)
 
 -   How does `semi_join()` differ from `inner_join()`?
+It does not actually add data from the other dataframe, just filters the coloumns of the left dataframe
 
 -   What, if anything, would change if we reversed the order of the data tables? Think about it, then try.
+Likely, would include enrollment instead of students, but would include same classes (observations)
 
 ```{r}
+enrollments_1 |> 
+  semi_join(students_1)
 ```
 
 ### Example 6 {-}
@@ -215,10 +238,15 @@ students_1 |>
 ```
 
 -   What did this do? What info would it give us?
+It only included observations not present in the right dataframe, ie, not in the THD building
 
 -   What, if anything, would change if we reversed the order of the data tables? Think about it, then try.
+It would just show ART101 instead of ANTH101, and would again show enrollements instead of student
+(like if you agree. I liked!)
 
 ```{r}
+enrollments_1 |> 
+  anti_join(students_1)
 ```
 
 
@@ -241,7 +269,7 @@ Filtering joins keep specific observations from the left table based on whether 
 
 ## Exercises
 
-{{< include activity-instructions.qmd >}}
+
 
 ### Exercise 1: Where are my keys? {.unnumbered}
 
@@ -268,9 +296,10 @@ enrollments_2
 ```
 
 To connect the course enrollments to the students' courses, try do a `left_join()`. You get an error! Identify the problem by reviewing the error message and the datasets we're trying to join.
+The key variables are different names! course and class
 
 ```{r eval = FALSE}
-# eval = FALSE: don't evaluate this chunk when knitting. it produces an error.
+ eval = FALSE: #don't evaluate this chunk when knitting. it produces an error.
 students_2 |> 
   left_join(enrollments_2)
 ```
@@ -284,7 +313,7 @@ students_2 |>
   left_join(enrollments_2, join_by(class == course))
 ```
 
-```{r}
+```{r eval=FALSE}
 #| eval: false  # keep this false since it will produce an error
 
 # The order of the keys is important:
@@ -322,6 +351,7 @@ enrollments_3
 
 Try doing a `left_join()` to link the students' classes to their enrollment info. Did this work? Try and figure out the culprit by examining the output.
 
+There are no matches between the left and right dataframe for both key variables (class and grade)
 ```{r}
 students_3 |> 
   left_join(enrollments_3)
@@ -330,6 +360,7 @@ students_3 |>
 #### Part d {.unnumbered}
 
 The issue here is that our datasets have *2* column names in common: `class` and `grade`. BUT `grade` is measuring 2 different things here: individual student grades in `students_3` and average student grades in `enrollments_3`. Thus it doesn't make sense to try to join the datasets with respect to this variable. We can again solve this by specifying that we want to join the datasets using the `class` variable as a *key*. What are `grade.x` and `grade.y`?
+grade.x is the value of grade from the left dataframe, and grade.y is the value of grade from the right dataframe
 
 ```{r}
 students_3 |> 
@@ -367,16 +398,21 @@ Use the appropriate join for each prompt below. In each case, think before you t
 
 ```{r}
 # 1. We want contact info for people who HAVEN'T voted
+contact |>
+  anti_join(voters, join_by(name==id))
 
 
 # 2. We want contact info for people who HAVE voted
-
+contact |>
+  semi_join(voters, join_by(name==id))
 
 # 3. We want any data available on each person
-
+contact |>
+  full_join(voters, join_by(name==id))
 
 # 4. When possible, we want to add contact info to the voting roster
-
+voters |>
+  left_join(contact, join_by(id==name))
 
 ```
 
@@ -417,11 +453,12 @@ Use R code to take a quick glance at the data.
 
 ```{r}
 # How many observations (rows) and variables (columns) are there in the grades data?
-
+str(grades)
+# 5844 rows, 3 columns
 
 # How many observations (rows) and variables (columns) are there in the courses data?
-
-
+str(courses)
+# 1718 rows, 6 columns
 ```
 
 
@@ -450,12 +487,12 @@ courses |>
 For our class size exploration, obtain the *total* enrollments in each `sessionID`, combining any cross-listed sections. Save this as `courses_combined`. NOTE: There's no joining to do here!
 
 ```{r}
-# courses_combined <- courses |> 
-#   ___(sessionID) |> 
-#   ___(enroll = sum(___))
+courses_combined <- courses |>
+  group_by(sessionID) |>
+  summarize(enroll = sum(enroll))
 
 # Check that this has 1695 rows and 2 columns
-# dim(courses_combined)
+dim(courses_combined)
 ```
 
 #### Part b {.unnumbered}
@@ -463,10 +500,16 @@ For our class size exploration, obtain the *total* enrollments in each `sessionI
 Let's first examine the question of class size from the *administration*'s viewpoint. To this end, calculate the median class size across all class sections. (The median is the *middle* or 50th percentile. Unlike the *mean*, it's not skewed by outliers.) THINK FIRST:
 
 -   Which of the 2 datasets do you need to answer this question? One? Both?
+I think I just need course_combined...
 -   If you need course information, use `courses_combined` not `courses`.
 -   Do you have to do any joining? If so, which dataset will go on the left, i.e. which dataset includes your primary observations of interest? Which join function will you need?
+Shouldn't have to!
 
 ```{r}
+courses_combined |>
+  summarize(median(enroll))
+#or just
+median(courses_combined$enroll)
 ```
 
 #### Part c {.unnumbered}
@@ -474,19 +517,28 @@ Let's first examine the question of class size from the *administration*'s viewp
 But how big are classes from the student perspective? To this end, calculate the median class size for each individual student. Once you have the correct output, store it as `student_class_size`. THINK FIRST:
 
 -   Which of the 2 datasets do you need to answer this question? One? Both?
+I will definitely need both
 -   If you need course information, use `courses_combined` not `courses`.
 -   Do you have to do any joining? If so, which dataset will go on the left, i.e. which dataset includes your primary observations of interest? Which join function will you need?
+grades ought to go on the left, since its per student!
 
 ```{r}
+student_class_size <- grades |>
+  left_join(courses_combined) |>
+    group_by(sid) |>
+    summarize(med_size = median(enroll))
+student_class_size
 ```
 
 #### Part d {.unnumbered}
 
 The median class size varies from student to student. To get a sense for the typical student experience and range in student experiences, construct and discuss a histogram of the median class sizes experienced by the students.
 
+The most common median class size by a good deal is right around 20, but generally the range between 18 and 24 is fairly typical. Although in fewer numbers, that is small chunk of students with media class sizes between 25 and 30, descending as we approach 30. Median class sizes past 30 are rare, with only about 1-3 students for each value, the maximum being 1 student with a median class size of 38. On the lower side, there a good few students who have median class sizes between 16 and 17, but frequency drops off steeply below that, with only 2 students at the minimum, having median class sizes of 12.
+
 ```{r}
-# ggplot(student_class_size, aes(x = ___)) + 
-#   geom___()
+ ggplot(student_class_size, aes(x = med_size)) + 
+   geom_histogram(color="black",fill="coral2", binwidth=1)
 ```
 
 
@@ -498,6 +550,8 @@ The median class size varies from student to student. To get a sense for the typ
 Show data on the students that enrolled in `session1986`. THINK FIRST: Which of the 2 datasets do you need to answer this question? One? Both?
 
 ```{r}
+grades |>
+  filter(sessionID=="session1986")
 ```
 
 #### Part b {.unnumbered}
@@ -512,6 +566,8 @@ dept_E <- courses |>
 What students enrolled in classes in department E? (We just want info on the students, not the classes.)
 
 ```{r}
+grades |>
+  semi_join(dept_E)
 ```
 
 
@@ -537,6 +593,10 @@ gpa_conversion
 How many total student enrollments are there in each department? Order from high to low.
 
 ```{r}
+courses |>
+  group_by(dept) |>
+  summarize(total=sum(enroll)) |>
+  arrange(desc(total))
 ```
 
 #### Part b {.unnumbered}
@@ -544,6 +604,11 @@ How many total student enrollments are there in each department? Order from high
 What's the grade-point average (GPA) for each student?
 
 ```{r}
+grades |>
+  left_join(gpa_conversion) |>
+  group_by(sid) |>
+  summarize(gpa= mean(gp, na.rm=TRUE))
+
 ```
 
 #### Part c {.unnumbered}
@@ -551,6 +616,11 @@ What's the grade-point average (GPA) for each student?
 What's the median GPA across all students?
 
 ```{r}
+grades |>
+  left_join(gpa_conversion) |>
+  group_by(sid) |>
+  summarize(gpa= mean(gp, na.rm=TRUE)) |>
+  summarize(med_gpa=median(gpa))
 ```
 
 #### Part d {.unnumbered}
@@ -558,6 +628,13 @@ What's the median GPA across all students?
 What fraction of grades are below B+?
 
 ```{r}
+grades |>
+  left_join(gpa_conversion) |>
+  mutate(under_b_plus=gp<3.3) |>
+  group_by(under_b_plus) |>
+  summarize(n=n()) |>
+  mutate(frac=n/sum(n))
+#can you count S and AU as "below B+"? It's hard to tell, so I left them seperate
 ```
 
 #### Part e {.unnumbered}
@@ -565,12 +642,31 @@ What fraction of grades are below B+?
 What's the grade-point average for each instructor? Order from low to high.
 
 ```{r}
+grades |>
+  left_join(gpa_conversion) |>
+  left_join(courses) |>
+  arrange(sessionID)
+  group_by(iid) |>
+  summarize(gpa= mean(gp, na.rm=TRUE)) |>
+  arrange(gpa)
 ```
 
 #### Part f {.unnumbered}
 
 CHALLENGE: Estimate the grade-point average for each department, and sort from low to high. NOTE: Don't include cross-listed courses. Students in cross-listed courses could be enrolled under either department, and we do not know which department to assign the grade to. HINT: You'll need to do multiple joins.
-
+```{r}
+grades |>
+  left_join(gpa_conversion) |>
+  left_join(
+    courses |>
+      filter(
+        (add_count(courses,sessionID))$n==1
+      )
+    ) |>
+  group_by(dept) |>
+  summarize(gpa= mean(gp, na.rm=TRUE)) |>
+  arrange(gpa)
+```
 
 
 ## Solutions
