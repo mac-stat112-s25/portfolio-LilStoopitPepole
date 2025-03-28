@@ -43,6 +43,7 @@ book:
       - ica/ica-reshape.qmd
       - ica/ica-join.qmd
       - ica/ica-factor.qmd
+      - ica/ica-strings.qmd
 
 format:
   html:
