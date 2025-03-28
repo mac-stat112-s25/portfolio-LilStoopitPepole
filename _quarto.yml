@@ -42,6 +42,7 @@ book:
       - ica/ica-imp.qmd
       - ica/ica-reshape.qmd
       - ica/ica-join.qmd
+      - ica/ica-factor.qmd
 
 format:
   html:
