@@ -8,7 +8,7 @@ fig-pos: 'h'
 fig-align: center
 code-fold: false
 ---
-##Background
+## Background
 
 ```{r}
 library(tidytuesdayR)
