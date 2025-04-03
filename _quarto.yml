@@ -45,6 +45,7 @@ book:
       - ica/ica-join.qmd
       - ica/ica-factor.qmd
       - ica/ica-strings.qmd
+      - ica/ica-effective.qmd
 
 format:
   html:
