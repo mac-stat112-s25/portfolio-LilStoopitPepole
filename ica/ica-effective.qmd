@@ -198,7 +198,6 @@ In designing your viz, think about *comparison*. Good viz make it easy for peopl
 
 ## Exercises
 
-{{< include activity-instructions.qmd >}}
 
 ### Exercise 1: Professionalism {.unnumbered}
 
@@ -231,7 +230,7 @@ Replace A, B, C, and D in the code below to:
 ```{r}
 ggplot(weather, aes(y = temp3pm, x = temp9am, color = location)) + 
   geom_point() + 
-  labs(x = "A", y = "B", title = "C", color = "D")  
+  labs(x = "Temperature at 9 AM (Degrees Celsius)", y = "Temperature at 3 PM (Degrees Celsius)", title = "Daily Temperature Shifts in Australia", color = "Location")  
 ```
 
 #### Part b {.unnumbered}
@@ -242,6 +241,7 @@ When we're including our plot in an article, paper, book, or other similar outle
 -   Include your x-axis, y-axis, and legend labels from Part a.
 -   Render your Rmd and check out how the figure caption appears.
 ```{r}
+#| echo: false
 #| fig-cap: "???"
 
 ggplot(weather, aes(y = temp3pm, x = temp9am, color = location)) + 
@@ -250,13 +250,14 @@ ggplot(weather, aes(y = temp3pm, x = temp9am, color = location)) +
 ```
 
 ```{r}
-#| echo: false
-#| fig-cap: "???"
+#| fig-cap: "FIGURE 1. 9 AM versus 3 PM temperatures in a given day in the Australian cities of Hobart, Uluru, and Wollongong"
 
 ggplot(weather, aes(y = temp3pm, x = temp9am, color = location)) + 
   geom_point() + 
-  labs(x = "???", y = "???", color = "???")  
+  labs(x = "Temperature at 9 AM (Degrees Celsius)", y = "Temperature at 3 PM (Degrees Celsius)", color = "Location")  
 ```
+
+
 
 \
 \
@@ -298,7 +299,7 @@ ggplot(weather, aes(x = temp3pm, fill = location)) +
 ```{r}
 #| echo: false
 #| fig-cap: "Density plots of 3pm temperatures in 3 Australian locations."
-#| fig-alt: "???"
+#| fig-alt: "A density plot of 3pm temperatures in Hobart, Uluru, and Wollongong, Australia. Uluru has the highest temperatures, but also displays a wider ranger than Hobart or Wollongong. Data from Macalester Statistics Department"
 
 ggplot(weather, aes(x = temp3pm, fill = location)) + 
   geom_density(alpha = 0.5) + 
@@ -320,6 +321,7 @@ Color is another important accessibility consideration. Let's check out the colo
 -   Above the image of crayons (I think it's crayons?), click "Choose file" and choose the plot file you just saved.
 -   Click the various simulator buttons (eg: Red-Weak/Protanomaly) to check out how the colors in this plot might appear to others.
 -   Summarize what you learn. What impact might our color choices have on one's ability to interpret the viz?
+For those with Protanopia, our viz is somewhat hard to read, for those with Tritanomaly, it is very hard to read, and for those with Tritanopia and Monochromacy, it is near-illegible. We cannot rely and singular value color distinctions: it may be very useful to incorporate brightness into our visualizations
 
 #### Part c {.unnumbered}
 
@@ -355,6 +357,8 @@ Let's scratch the surface of ethics in data viz. Central to this discussion is t
 
 At a minimum, our data viz should not mislead. Reconsider the climate change example from above. Why is this plot unethical and what impact might it have on policy, public opinion, etc?
 
+Because the excessively wide scale not only minimizes the impact of climate change, but also makes any data nearly illegible
+
 ![](https://mac-stat.github.io/images/112/bad_viz/bad_viz_climate_change.png)
 
 #### Part b {.unnumbered}
@@ -362,9 +366,11 @@ At a minimum, our data viz should not mislead. Reconsider the climate change exa
 Again, data viz ethical considerations go beyond whether or not a plot is misleading. As described in the warm-up, we need to consider: visibility, privacy, power, emotion & embodiment, pluralism, & context. Depending upon the audience and goals of a data viz, addressing these points might require more nuance. Mainly, the viz tools we've learned are a great base or foundation, but aren't the only approaches to data viz. 
 
 Pick one or more of the following examples of data viz to discuss with your group. How do the approaches taken:
-
+Decolonizing Data
 -   emphasize one or more of: visibility, privacy, power, emotion, embodiment, pluralism, and/or context?
+It depends how you look at it: if we are talking shown visualizations themselves, they emphasize visibility (many different categorical variables, and most common data is acknowledging people of origin/where you come from) and Emotion & Embodiment (They often record highly personal information about the experiences and history of either the creator or displayer of the visualization). On the other hand, the article on whole and the concept of "Decolonizing Data" is more in line with Power (Challenging the eurocentric narrative developed around data and advocating for historical and contemporary indigenous viz) and Pluralism (Acknowledging several different indigenous perspectives and comparing them with dominant styles of viz)
 -   improve upon what we might be able to convey with a simpler bar chart, scatterplot, etc?
+It shows a lot of different ways to represent variables, and also encourages us to draw on different traditional methodologies of encoding knowledge and data in how we construct our viz
 
 \
 \
@@ -423,8 +429,9 @@ For a deeper treatment of similar topics, and more examples, read [Data Feminism
 Practice critiquing some more complicated data viz listed at [Modern Data Science with R, Exercise 2.5](http://mdsr-book.github.io/exercises.html#exercise_25).
 
 Think about the following questions:
-
+I looked at the 2013 budget viz
 -   What story does the data graphic tell? What is the main message that you take away from it?
+While there were moderate increases in sections like Medicare and Medicaid, and SSI, these were mainly mandatory, and the biggest changes in discrentionary spending were  cuts to military spending on Procurement, Operation and Maintainence, R&D, and Personnel, to meet the budget cap.
 -   Can the data graphic be described in terms of the Grammar of Graphics (frame, glyphs, aesthetics, facet, scale, guide)? If so, please describe.
 -   Critique and/or praise the visualization choices made by the designer. Do they work? Are they misleading? Thought-provoking? Are there things that you would have done differently?
 
