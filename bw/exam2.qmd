@@ -9,7 +9,98 @@ fig-align: center
 code-fold: false
 ---
 ## Background
+### Load and Inspect
 
 ```{r}
 library(tidytuesdayR)
+library(tidyverse)
+library(rnaturalearth)
+library(sf)
+```
+```{r}
+tuesdata <- tt_load('2020-02-18')
+fc <- tuesdata$food_consumption
+```
+Loaded, gave it a sec cuz its downloading it right now!
+```{r}
+str(fc)
+head(fc, 22)
+distinct(fc, food_category)
+```
+### Clean up
+```{r}
+#I could do fct_recode, but why change the datatype?! I know its more elegant, but this is more sure, easier to debug (if i get order wrong it is annoying), and again, doesn't change the datatype.
+fcc <- fc |>
+  mutate(food_category = str_replace(food_category, "& Goat", "")) |>
+  mutate(food_category = str_replace(food_category, "Milk - inc. cheese", "Dairy")) |>
+  mutate(food_category = str_replace(food_category, "and Wheat Products", "")) |>
+  mutate(food_category = str_replace(food_category, "inc. Peanut Butter", ""))
+distinct(fcc, food_category)
+```
+## Most Consuming Countries
+::: {.callout-tip title="Question 1"}
+**Which 5 countries consume the most food?** 
+Demonstrate via table and graph
+:::
+### Cleaning and Table
+```{r}
+fcc_sum <- fcc |>
+  group_by(country) |>
+  summarize(total_consumption = sum(consumption)) |>
+  arrange(desc(total_consumption)) |>
+  head(5)
+
+#It Just Works
+fcc_sum
+```
+```{r}
+#hold up, albania?
+fcc |>
+  filter(country=="Albania")
+#oh, its all the water weight in the milk and such!
+```
+### Visualization
+```{r}
+ggplot(fcc_sum, aes(
+    x=fct_reorder(country, desc(total_consumption)), 
+    y=total_consumption
+  )) +
+  geom_col(fill="yellow") +
+  labs(x="country")
+```
+## Top Consumers of Each Food
+::: {.callout-tip title="Question 2"}
+**Which 5 countries consume the most food** ***category*****?** 
+Demonstrate via table and graph
+:::
+### Cleaning and Table
+```{r}
+fcc_cat <- fcc |>
+  select(-co2_emmission) |>
+  group_by(food_category) |>
+  slice_max(n = 5, consumption)
+#Lamb-and-Goated
+fcc_cat
+```
+### Visualization
+```{r}
+#| fig-height: 10
+#| fig-width: 20
+ggplot(fcc_cat, aes(
+    x=country,
+    y=consumption
+  )) +
+  facet_wrap(~ food_category, scales="free") +
+  geom_col()
+  #that took longer than i thought it would. still doesn't look great, but would need some sort of more drastic measures to actually get that bottom scale legible within this viz
+  
+```
+## Worldwide Consumption
+::: {.callout-tip title="Question 3"}
+**What does consumption of each food category look like in** ***each country*****?**
+Show via chloropleth
+:::
+### Initial Wrangling
+```{r}
+
 ```
