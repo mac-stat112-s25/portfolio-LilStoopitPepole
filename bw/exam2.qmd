@@ -1,5 +1,5 @@
 ---
-title: "Exam 2"
+title: "Food Consumption 2"
 number-sections: true
 execute: 
   warning: false
@@ -16,6 +16,7 @@ library(tidytuesdayR)
 library(tidyverse)
 library(rnaturalearth)
 library(sf)
+library(RColorBrewer)
 ```
 ```{r}
 tuesdata <- tt_load('2020-02-18')
@@ -66,7 +67,7 @@ ggplot(fcc_sum, aes(
     y=total_consumption
   )) +
   geom_col(fill="yellow") +
-  labs(x="country")
+  labs(x="country", title="5 countries which consume the most food")
 ```
 ## Top Consumers of Each Food
 ::: {.callout-tip title="Question 2"}
@@ -91,7 +92,8 @@ ggplot(fcc_cat, aes(
     y=consumption
   )) +
   facet_wrap(~ food_category, scales="free") +
-  geom_col()
+  geom_col() +
+  labs(title="Top five consumers of each food category")
   #that took longer than i thought it would. still doesn't look great, but would need some sort of more drastic measures to actually get that bottom scale legible within this viz
   
 ```
@@ -100,7 +102,96 @@ ggplot(fcc_cat, aes(
 **What does consumption of each food category look like in** ***each country*****?**
 Show via chloropleth
 :::
-### Initial Wrangling
+###First, flawed wrang and vis
 ```{r}
-
+#| fig-height: 10
+#| fig-width: 20
+ne_countries(returnclass = "sf") |>
+  #bring in boundary dataset
+  select(name, geometry) |>
+  #only keep the country name and the boundaries
+  left_join(fcc |> select(-co2_emmission),
+            #bringing only consumption and name
+            join_by(name == country)) |>
+  #joining by country name
+  ggplot() +
+  geom_sf(aes(fill=consumption)) +
+  facet_wrap(~food_category) +
+  theme(legend.position = "left", legend.key.size = unit(0.5, "in"), legend.text = element_text(size =14), legend.title = element_text(size =14) )
+```
+Problems: scale is indiscernable, and many countries are missing
+###Sussing out NAs
+```{r}
+ne_countries(returnclass = "sf") |>
+  select(name, geometry) |>
+  left_join(fcc |> select(-co2_emmission),
+            join_by(name == country)) |>
+            filter(is.na(consumption)) |>
+            st_drop_geometry() 
+#i also could use an anti join but i would have to know that the na's were generated from a poor join
+```
+### NA-Removing Wrangling and viz
+```{r}
+#| fig-height: 10
+#| fig-width: 20
+ne_countries(returnclass = "sf") |>
+  select(name, geometry) |>
+  mutate(name = ifelse(name == "United States of America", "USA", name)) |>
+  mutate(name = ifelse(name == "Bosnia and Herz.", "Bosnia and Herzegovina", name)) |>
+  mutate(name = ifelse(name == "Czechia", "Czech Republic", name)) |>
+  mutate(name = ifelse(name == "Taiwan", "Taiwan. ROC", name)) |>
+  #these lines fix the names 
+  left_join(fcc |> select(-co2_emmission), 
+            join_by(name==country)) |>
+  pivot_wider(names_from = food_category,
+              values_from = "consumption") |>
+  #oh i see here, we're making it so that everyone has every food cartegory, except NA, which is the useless one. just so they have some sort of value for it, even if its "NA".
+  select(-"NA") |>
+  pivot_longer(cols = c(-name, -geometry),
+# and now of course we're returning it to the way it was before, although you could certainly plot it in this format as well
+               names_to = "food_category",
+                values_to = "consumption") |>
+  ggplot() +
+  geom_sf(aes(fill=consumption)) +
+  facet_wrap(~food_category) +
+  theme(legend.position = "left", legend.key.size = unit(0.5, "in"), legend.text = element_text(size =14), legend.title = element_text(size =14) )
+```
+Problems: still very hard to read because of scale. unfortunately, you cannot fix this with scale = "free", cuz that doesn't work in geom_sf
+###Statistics
+```{r}
+fcc |>
+  group_by(food_category) |>
+  summarize(min(consumption),max(consumption),range=(max(consumption)-min(consumption)), sd(consumption))
+#basically hugely varied ranges, partially cuz they are different masses to how much it can actually be part of your diet
+```
+###Answer to research question 3 (Final Visualization)
+```{r}
+#| fig-height: 17
+#| fig-width: 18
+ne_countries(returnclass = "sf") |>
+  select(name, geometry) |>
+  mutate(name = ifelse(name == "United States of America", "USA", name)) |>
+  mutate(name = ifelse(name == "Bosnia and Herz.", "Bosnia and Herzegovina", name)) |>
+  mutate(name = ifelse(name == "Czechia", "Czech Republic", name)) |>
+  mutate(name = ifelse(name == "Taiwan", "Taiwan. ROC", name)) |>
+  left_join(
+    fcc |> 
+      select(-co2_emmission) |>
+      group_by(food_category) |>
+      mutate(consumption = (consumption - mean(consumption))/sd(consumption)),
+    #measures by how many standard deviations away from the mean
+            join_by(name==country)) |>
+  pivot_wider(names_from = food_category,
+              values_from = "consumption") |>
+  select(-"NA") |>
+  pivot_longer(cols = c(-name, -geometry),
+               names_to = "food_category",
+                values_to = "consumption") |>
+  ggplot() +
+  geom_sf(aes(fill=consumption)) +
+  facet_wrap(~food_category, ncol=3) +
+  #omg its so much more legible like that
+  labs(title =  "Worldwide Relative Food Consumption by Category") +
+  theme(legend.position = "left", legend.key.size = unit(0.5, "in"), legend.text = element_text(size =14), legend.title = element_text(size =14), title= element_text(size=18)) +
+  scale_fill_viridis_c(name = "Relative Consumption")
 ```
