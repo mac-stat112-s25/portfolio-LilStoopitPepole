@@ -715,7 +715,7 @@ When categorical information is stored as a <em>character</em> variable, the cat
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>grade_distribution <span class="sc">|&gt;</span></span>
 <span id="cb26-2"><a href="#cb26-2"></a>  <span class="fu">mutate</span>(<span class="at">grade =</span> <span class="fu">fct_relevel</span>(grade, <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"A-"</span>, <span class="st">"B+"</span>, <span class="st">"B"</span>, <span class="st">"B-"</span>, <span class="st">"C+"</span>, <span class="st">"C"</span>, <span class="st">"C-"</span>, <span class="st">"D+"</span>, <span class="st">"D"</span>, <span class="st">"D-"</span>, <span class="st">"NC"</span>, <span class="st">"S"</span>, <span class="st">"AU"</span>))) <span class="sc">|&gt;</span></span>
-<span id="cb26-3"><a href="#cb26-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> grade, <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb26-3"><a href="#cb26-3"></a>   <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> grade, <span class="at">y =</span> n)) <span class="sc">+</span></span>
 <span id="cb26-4"><a href="#cb26-4"></a>    <span class="fu">geom_col</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -1758,7 +1758,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb34-318"><a href="#cb34-318"></a><span class="in">```{r}</span></span>
 <span id="cb34-319"><a href="#cb34-319"></a>grade_distribution <span class="sc">|&gt;</span></span>
 <span id="cb34-320"><a href="#cb34-320"></a>  <span class="fu">mutate</span>(<span class="at">grade =</span> <span class="fu">fct_relevel</span>(grade, <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"A-"</span>, <span class="st">"B+"</span>, <span class="st">"B"</span>, <span class="st">"B-"</span>, <span class="st">"C+"</span>, <span class="st">"C"</span>, <span class="st">"C-"</span>, <span class="st">"D+"</span>, <span class="st">"D"</span>, <span class="st">"D-"</span>, <span class="st">"NC"</span>, <span class="st">"S"</span>, <span class="st">"AU"</span>))) <span class="sc">|&gt;</span></span>
-<span id="cb34-321"><a href="#cb34-321"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> grade, <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb34-321"><a href="#cb34-321"></a>   <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> grade, <span class="at">y =</span> n)) <span class="sc">+</span></span>
 <span id="cb34-322"><a href="#cb34-322"></a>    <span class="fu">geom_col</span>()</span>
 <span id="cb34-323"><a href="#cb34-323"></a><span class="in">```</span></span>
 <span id="cb34-324"><a href="#cb34-324"></a></span>
