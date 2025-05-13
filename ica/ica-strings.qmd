@@ -337,6 +337,14 @@ Create a new dataset from `courses_clean`, named `stat`, that only includes STAT
 -   The result should have 19 rows and 4 columns.
 
 ```{r}
+stat <-
+  courses_clean |>
+    filter(dept=="STAT") |>
+    mutate(name=str_replace(name, "Introduction to", "")) |>
+    mutate(name=str_replace(name, "Statistical", "Stat")) |>
+    separate(time,c("start_time","end_time"), sep=" - ") |>
+    select(number, name, start_time, enroll)
+stat
 ```
 
 
@@ -354,6 +362,12 @@ In the next exercises, we'll dig into enrollments. Let's get the data ready for 
 Save the results as `enrollments` (don't overwrite `courses_clean`).
 
 ```{r}
+enrollments <-
+  courses_clean |>
+  filter( !dept %in% c("INTD","PE")) |>
+  filter(!(dept %in% c("MUSI", "THDA") & as.numeric(number) < 100)) |>
+  filter(!str_detect(section, "L"))
+enrollments
 ```
 
 
@@ -361,8 +375,24 @@ Save the results as `enrollments` (don't overwrite `courses_clean`).
 ### Exercise 6: Enrollment & departments {.unnumbered}
 
 Explore enrollments by department. *You* decide what research questions to focus on. Use both visual and numerical summaries.
+Which foreign language (that has it's own department) has, on average, the most  full elementary/first-year classes?
+```{r} 
+elementary <- enrollments |>
+  filter(dept %in% c("SPAN", "FREN", "GERM", "JAPA", "CHIN", "RUSS", "PORT")) |>
+  filter(number<120) |>
+  select(dept, section, number, name, avail)
+elementary
 
-
+elementary |>
+  group_by(dept) |>
+  summarize(avgspace=mean(as.numeric(avail)))
+  
+ elementary |>
+  group_by(dept) |>
+  summarize(avgspace=mean(as.numeric(avail))) |>
+  ggplot(aes(x=dept, y=avgspace)) +
+   geom_col()
+```
 
 ### Exercise 7: Enrollment & faculty {.unnumbered}
 
@@ -375,20 +405,20 @@ To comment/uncomment several lines of code at once, highlight them then click <k
 :::
 
 ```{r}
-# enrollments |>
-#   filter(dept %in% c("STAT", "COMP"), number == 112, section == "01")
+enrollments |>
+  filter(dept %in% c("STAT", "COMP"), number == 112, section == "01")
 ```
 
 Notice that these are the exact same section! In order to not double count an instructor's enrollments, we can keep only the courses that have `distinct()` *combinations* of `days, time, instructor` values.  Uncomment the code lines in the chunk below.
 
 ```{r}
-# enrollments_2 <- enrollments |> 
-#   distinct(days, time, instructor, .keep_all = TRUE)
+enrollments_2 <- enrollments |>
+  distinct(days, time, instructor, .keep_all = TRUE)
 
 # NOTE: By default this keeps the first department alphabetically
 # That's fine because we won't use this to analyze department enrollments!
-# enrollments_2 |> 
-#   filter(instructor == "Brianna Heggeseth", name == "Introduction to Data Science")
+enrollments_2 |>
+  filter(instructor == "Brianna Heggeseth", name == "Introduction to Data Science")
 ```
 
 *Now*, explore enrollments by instructor. *You* decide what research questions to focus on. Use both visual and numerical summaries.
@@ -396,6 +426,32 @@ Notice that these are the exact same section! In order to not double count an in
 CAVEAT: The above code doesn't deal with *co-taught* courses that have more than one instructor. Thus instructors that co-taught are recorded as a pair, and their co-taught enrollments aren't added to their total enrollments. This is tough to get around with how the data were scraped as the instructor names are smushed together, not separated by a comma!
 
 ```{r}
+#but this code maybe does?
+enrollments_2 <- enrollments_2 |>
+  separate(instructor, 
+          c("instructor", "instructor2"),
+          "(?<=[a-z])(?=[A-Z])")
+enrollments_2 |>
+  arrange(as.numeric(avail))
+
+#i am a genius. unless someone has one of those kooky last names like "McNally" that has a capital in the middle. 
+#...like kelly MacGregor. Darn. and MaryBeth Gagner. Surely theres some way to make it only do this when there are two spaces but i don't know how to do that lol, so we'll just treat them by their first names. the only actual boon here is to be able to see the name of the first instructor clearly, but regardless, lets ask the same question: which instructor has the most full classes, on average?
+
+enrollments_2 |>
+  select(dept, section, number, name, avail, instructor) |>
+  group_by(instructor) |>
+  summarize(avgspace=mean(as.numeric(avail))) |>
+  arrange(avgspace)
+  
+enrollments_2 |>
+  select(dept, section, number, name, avail, instructor) |>
+  group_by(instructor) |>
+  summarize(avgspace=mean(as.numeric(avail))) |>
+  arrange(avgspace) |>
+  head(8) |>
+  mutate(instructor=fct_reorder(instructor, avgspace) ) |>
+  ggplot(aes(x=instructor, y=avgspace)) +
+   geom_col()
 ```
 
 
