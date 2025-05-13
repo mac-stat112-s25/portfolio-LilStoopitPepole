@@ -465,6 +465,9 @@ Next, let's think about what to *do* about the missing values. There is no perfe
 Calculate the average duration of a film. THINK: How can we deal with the NA's?
 
 ```{r}
+imdb_messy |>
+  filter(!is.na(duration)) |>
+  summarize(mean(duration))
 ```
 
 Follow-up:
@@ -483,16 +486,19 @@ head(imdb_temp)
 Follow-up questions:
 
 -   What did `drop_na()` do? How many data points are left?
+It removed every single row with an NA in any coloumn, leaving only 6 rows
 -   In what situations might this function be a good idea?
+Where you are comprehensively analyzing all variables,therefore any NA renders a datapoint useless
 -   In what situations might this function be a bad idea?
+when there are several variables where NA is expected or meaningful, or where you only need to see certain variables.
 
 #### Part c {.unnumbered}
 
 `drop_na()` removes data points that have *any* NA values, even if we don't care about the variable(s) for which data is missing. This can result in losing a lot of data points that *do* have data on the variables we actually care about! For example, suppose we only want to explore the relationship between film `duration` and whether it's in `color`. Check out a plot:
 
 ```{r}
-# ggplot(imdb_messy, aes(x = duration, fill = color)) + 
-#   geom_density()
+ggplot(imdb_messy, aes(x = duration, fill = color)) +
+  geom_density()
 ```
 
 Follow-up:
@@ -502,6 +508,14 @@ Follow-up:
 -   How many movies remain in your new dataset? Hence why this is better than using the dataset from part b?
 
 ```{r}
+imdb_color <- imdb_messy |>
+  filter(!is.na(color) & !is.na(duration))
+imdb_color
+nrow(imdb_color) 
+nrow(imdb_messy)
+#we only lost like 30 rows or smth, rather than nearly all of them. this gives a much better dataset but still excludes NAs in the variables that matter
+ggplot(imdb_color, aes(x = duration, fill = color)) +
+  geom_density()
 ```
 
 #### Part d {.unnumbered}
@@ -509,6 +523,10 @@ Follow-up:
 In some cases, missing data is more *non*-data than *unknown* data. For example, the films with NAs for `actor_1_facebook_likes` actually have *0* Facebook likes--they don't even have actors! In these cases, we can *replace* the NAs with a 0. Use the `replace_na()` function to create a new dataset (`imdb_temp`) that replaces the NAs in `actor_1_facebook_likes` with 0. You'll have to check out the help file for this function.
 
 ```{r}
+imdb_temp <- imdb_messy |>
+  mutate(actor_1_facebook_likes = replace_na(actor_1_facebook_likes, 0))
+imdb_temp |>
+  arrange(actor_1_facebook_likes)
 ```
 
 
@@ -519,10 +537,17 @@ Let's practice the above ideas while also planting some seeds for the course pro
 -   Share with each other: What are some personal hobbies or passions or things you've been thinking about or things you'd like to learn more about? Don't think too hard about this! Just share what's at the top of mind today.
 
 -   Each individual: Find a dataset online that's related to one of the topics you shared in the above prompt.
+
 -   Discuss what data you found with your group!
 -   Load the data into RStudio, perform some basic checks, and perform some preliminary cleaning, as necessary.
-
-
+```{r}
+animes <- read_csv("../data/anime/AnimeList.csv")
+spec(animes)
+animes |>
+mutate(across(where(is.character), as.factor)) |>
+summary()
+#did not know this included some less than savory offerings, although as long as we don't target them, shouldn't make for too much trouble. otherwise, all in all, this is a super clean dataset, all things considered. there might be some dupes with cyberborg 009 and a.i. am human, but its hard to tell without an investigation that goes beyond preliminary
+```
 
 ## Solutions
 
