@@ -1,0 +1,58 @@
+---
+title: "Food Consumption 1"
+number-sections: true
+execute: 
+  warning: false
+fig-env: 'figure'
+fig-pos: 'h'
+fig-align: center
+code-fold: false
+---
+##Background, Packages, and Import
+```{r}
+library(tidytuesdayR)
+library(tidyverse)
+tuesdata <- tt_load('2020-02-18')
+fc <- tuesdata$food_consumption
+```
+##Exploration
+```{r}
+str(fc)
+head(fc,22)
+tail(fc,22)
+summary(mutate(fc, across(where(is.character), as.factor)))
+```
+##Understanding
+```{r}
+#| fig-height: 50
+#| fig-width: 10
+ggplot(fc, aes(consumption, country, fill=food_category)) +
+geom_col()
+ggplot(fc, aes(consumption, food_category)) +
+  facet_wrap(~country, ncol=5, scale="free_x") +
+  geom_col()
+#wth these two are v clearly the best options
+ggplot(fc, aes(consumption, country)) +
+geom_col()
+fc |>
+  ggplot(aes(food_category, country, fill=consumption)) +
+  geom_raster()
+```
+```{r}
+#| fig-height: 5
+#| fig-width: 10
+ggplot(fc, aes(y=consumption, x=food_category)) +
+  geom_boxplot()
+```
+
+##Final Visualization
+
+```{r}
+#| fig-alt: "A set of bar graphs showing the mass of food of different types consumed by per capita per year in 140 different countries. In most countries, Dairy, Wheat, or Rice are most consumed on a mass basis. Data from TidyTuesday: https://github.com/rfordatascience/tidytuesday "
+#| fig-height: 50
+#| fig-width: 10
+ggplot(fc, aes(consumption, food_category)) +
+  facet_wrap(~country, ncol=5, scale="free_x") +
+  geom_col(fill="yellow", color="black") +
+  labs(title="Consumption of different foods across the world (KGs, per person, per year)", x="Consumption (kg/cap./yr.)", y="Food Category")
+```
